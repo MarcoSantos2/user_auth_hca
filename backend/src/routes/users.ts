@@ -1,31 +1,12 @@
-import express, { Request, Response } from 'express';
-import { googleAuth, generateToken, hashPassword, comparePassword } from '../middleware/auth';
+// Script defines the routes related to user actions (signup and signin) and maps them to the appropriate controller methods.
 
-const router = express.Router();
+import { Router } from 'express';
+import userController from '../controllers/userController';
+import { googleAuth } from '../middleware/auth';
 
-// Mock Database
-const users: any[] = [];
+const router = Router();
 
-router.post('/signup', googleAuth, (req: Request, res: Response) => {
-  const { email, name, sub } = req.body.user;
-  let user = users.find(u => u.email === email);
-  if (!user) {
-    user = { id: sub, email, name, password: hashPassword(sub) };
-    users.push(user);
-  }
-  const token = generateToken({ id: user.id, email: user.email });
-  res.json({ token });
-});
-
-router.post('/signin', googleAuth, (req: Request, res: Response) => {
-  const { email, sub } = req.body.user;
-  const user = users.find(u => u.email === email);
-  if (user && comparePassword(sub, user.password)) {
-    const token = generateToken({ id: user.id, email: user.email });
-    res.json({ token });
-  } else {
-    res.status(401).send('Authentication failed');
-  }
-});
+router.post('/signup', googleAuth, userController.signup);
+router.post('/signin', googleAuth, userController.signin);
 
 export default router;

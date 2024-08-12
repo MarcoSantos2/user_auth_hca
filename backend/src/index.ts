@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
-import userRoutes from './routes/users';
+import userRoutes from './routes/users'; // Importing user routes
 
 dotenv.config();
 
@@ -18,7 +18,7 @@ app.use(express.json());
 // Serve static files
 app.use(express.static(path.join(__dirname, '../public')));
 
-// User routes
+// User routes - map /api/users to userRoutes
 app.use('/api/users', userRoutes);
 
 // Serve the Google Sign-In HTML file dynamically
