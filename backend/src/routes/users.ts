@@ -4,7 +4,11 @@ import { Router } from 'express';
 import userController from '../controllers/userController';
 import { googleAuth } from '../middleware/auth';
 
+
 const router = Router();
+
+// Route to handle GET requests for retrieving the list of users
+router.get('/', userController.getUsers);
 
 router.post('/signup', googleAuth, userController.signup);
 router.post('/signin', googleAuth, userController.signin);
