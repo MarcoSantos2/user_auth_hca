@@ -1,11 +1,8 @@
-// This script Handles interactions with the database
-
-import { RowDataPacket } from 'mysql2';
-import { User } from '../models/User'; // Shared User interface
+import { User } from '../models/User';
 
 
-const findAll = async (): Promise<User[]> => {
-  const users: User[] = [
+const findAll = (): User[] => {
+ return [
     {
       id: 1,
       email: 'user1@felipe.com',
@@ -36,24 +33,21 @@ const findAll = async (): Promise<User[]> => {
       updated_at: new Date(),
       deleted_at: null,
     },
+    {
+      id: 4,
+      email: 'JACKONEILL@vamosla.com',
+      name: 'User FOUR',
+      password: 'hashed_password4',
+      verify: false,
+      created_at: new Date(),
+      updated_at: new Date(),
+      deleted_at: null,
+    },
+
   ];
 
-  return users;
 };
 
 export default {
   findAll,
 };
-
-
-// Executes a SQL query to retrieve all users from the database
-/*
-const findAll = async (): Promise<User[]> => {
-  const [rows] = await db.query<RowDataPacket[]>('SELECT * FROM users WHERE deleted_at IS NULL');
-  return rows as User[];
-};
-
-export default {
-  findAll,
-};
-*/

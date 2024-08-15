@@ -8,7 +8,6 @@
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      "sourceMap": true              // Can be used to ggenerate source maps for debugging. Felipe, let me know if this is unnecessary
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules"]

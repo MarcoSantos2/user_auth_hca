@@ -1,9 +1,7 @@
-// functionality from users.ts moved to this script, making sure that Each layer has a clear responsibility
-// Handles HTTP requests and responses, interacting with the service layer.
 import { Request, Response } from 'express';
-import userService from '../services/userService';
+import * as userService from '../services/userService';
 
-const signup = async (req: Request, res: Response): Promise<void> => {
+export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, name, sub } = req.body.user;
     const token = await userService.signup({ email, name, sub });
@@ -13,7 +11,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const signin = async (req: Request, res: Response): Promise<void> => {
+export const signin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, sub } = req.body.user;
     const token = await userService.signin({ email, sub });
@@ -28,19 +26,11 @@ const signin = async (req: Request, res: Response): Promise<void> => {
 };
 
 
-// GetUsers method
-const getUsers = async (req: Request, res: Response): Promise<void> => {
+export const getUsers = (req: Request, res: Response): void => {
   try {
-    const users = await userService.getAllUsers();
+    const users = userService.getAllUsers();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
-};
-
-
-export default {
-  signup,
-  signin,
-  getUsers, // Export getUsers method
 };

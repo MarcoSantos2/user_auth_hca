@@ -1,5 +1,3 @@
-//Keep only one definition of the User interface in a separate file. Both userService.ts and userRepository.ts can import to ensures consistency
-
 export interface User {
     id: number;
     email: string;
