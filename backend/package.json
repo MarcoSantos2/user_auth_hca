@@ -25,8 +25,10 @@
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "google-auth-library": "^9.11.0",
-    "jsonwebtoken": "^9.0.2"
-
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
