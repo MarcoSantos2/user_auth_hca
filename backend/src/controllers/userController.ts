@@ -25,10 +25,9 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
-export const getUsers = (req: Request, res: Response): void => {
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = userService.getAllUsers();
+    const users = await userService.getAllUsers();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });

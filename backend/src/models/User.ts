@@ -1,28 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, BaseEntity } from "typeorm";
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number = 0;
+  id!: number;
 
   @Column({ unique: true })
-  email: string = '';
+  email!: string;
 
   @Column()
-  name: string = '';
+  name!: string;
 
   @Column()
-  password: string = '';
+  password!: string;
 
   @Column({ default: false })
   verify: boolean = false;
 
-  @Column()
+  @CreateDateColumn()
   created_at: Date = new Date();
 
-  @Column()
+  @UpdateDateColumn()
   updated_at: Date = new Date();
 
-  @Column({ nullable: true })
+  @DeleteDateColumn()
   deleted_at: Date | null = null;
 }

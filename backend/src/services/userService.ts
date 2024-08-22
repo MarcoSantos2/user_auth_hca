@@ -1,6 +1,6 @@
 import { User } from '../models/User'; // Import the shared User interface
 import { hashPassword, comparePassword, generateToken } from '../middleware/auth';
-import userRepository from '../repositories/userRepository';
+import * as userRepository from '../repositories/userRepository';
 
 const users: User[] = [];
 
@@ -32,6 +32,6 @@ export const signin = async ({ email, sub }: { email: string; sub: string }): Pr
   return null;
 };
 
-export const getAllUsers = (): User[] => {
-  return userRepository.findAll();  
+export const getAllUsers = (): Promise<User[]> => {
+  return userRepository.findAllUsers();
 };
