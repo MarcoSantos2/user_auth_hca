@@ -17,5 +17,5 @@ export const saveUser = async (user: Partial<User>): Promise<User> => {
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
-  await userRepository.delete({ id: Number(id) });
+  await userRepository.softDelete({ id: Number(id) });
 };

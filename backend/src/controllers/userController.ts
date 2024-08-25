@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 
+// TODO fix all error codes
+
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, name, sub } = req.body.user;
@@ -53,7 +55,18 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const updatedUser = await userService.updateUser(userId, updates);
     res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    res.status(422).json({ message: (error as Error).message });
+  }
+};
+
+// Extract the user ID from the URL parameters and new data from the request body, then call the service layer to apply the updates
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id;
+    const user = await userService.getUserById(userId);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(422).json({ message: (error as Error).message });
   }
 };
 

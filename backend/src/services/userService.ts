@@ -56,6 +56,15 @@ export const updateUser = async (id: string, updates: Partial<User>) => {
   return await userRepository.saveUser(user);
 };
 
+// Find User By Id
+export const getUserById = async (id: string) => {
+  const user = await userRepository.findUserById(id);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  return user;
+};
+
 // This function will delete the user from the DB
 export const deleteUser = async (id: string): Promise<void> => {
   const user = await userRepository.findUserById(id);
