@@ -3,12 +3,16 @@ import { User } from "../models/User";
 
 const userRepository = AppDataSource.getRepository(User);
 
+export const findUserByEmail = async (email: string): Promise<User | null> => {
+  return await userRepository.findOne({ where: { email } });
+};
+
 export const findAllUsers = async (): Promise<User[]> => {
   return await userRepository.find();
 };
 
-export const findUserById = async (id: string): Promise<User | null> => {
-  return await userRepository.findOne({ where: { id: Number(id) } });
+export const findUserById = async (uuid: string): Promise<User | null> => {
+  return await userRepository.findOne({ where: { uuid } });
 };
 
 export const saveUser = async (user: Partial<User>): Promise<User> => {
@@ -16,6 +20,6 @@ export const saveUser = async (user: Partial<User>): Promise<User> => {
   return await userRepository.save(newUser);
 };
 
-export const deleteUser = async (id: string): Promise<void> => {
-  await userRepository.softDelete({ id: Number(id) });
+export const deleteUser = async (uuid: string): Promise<void> => {
+  await userRepository.softDelete({ uuid });
 };

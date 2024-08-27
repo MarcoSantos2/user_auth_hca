@@ -1,24 +1,37 @@
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
-
-// TODO fix all error codes
+import { generateToken } from '../middleware/auth';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, name, sub } = req.body.user;
-    const token = await userService.signup({ email, name, sub });
-    res.json({ token });
+    if (!email || !name || !sub) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    }
+
+    const user = await userService.signup({ email, name, sub });
+    const token = generateToken({ id: user.uuid, email: user.email }); // Generate token using UUID and email
+    res.status(201).json({ uuid: user.uuid, name: user.name, email: user.email, token });
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    if ((error as Error).message.includes('already exists')) {
+      res.status(409).json({ message: 'User already exists' });
+    } else {
+      res.status(500).json({ message: (error as Error).message });
+    }
   }
 };
 
 export const signin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, sub } = req.body.user;
+    if (!email || !sub) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    }
     const token = await userService.signin({ email, sub });
     if (token) {
-      res.json({ token });
+      res.status(200).json({ token });
     } else {
       res.status(401).send('Authentication failed');
     }
@@ -30,7 +43,12 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await userService.getAllUsers();
-    res.status(200).json(users);  // Send the list of users as a JSON response
+    const result = users.map(user => ({
+      uuid: user.uuid,
+      name: user.name,
+      email: user.email,
+    }));
+    res.status(200).json(result);  // Send users' UUID, name, and email as a JSON response
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
@@ -40,10 +58,23 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, password } = req.body; // Get name, email, and password from request body
+    if (!name || !email || !password) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    } 
     const user = await userService.createUser({ name, email, password }); // Call the service layer to create the user
-    res.status(201).json(user); // Respond with the created user
+    const result = {
+      uuid: user.uuid,
+      name: user.name,
+      email: user.email,
+    };
+    res.status(201).json(result); //Respond with the created user's name, UUID, and email
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    if ((error as Error).message.includes('already exists')) {
+      res.status(409).json({ message: 'User already exists' });
+    } else {
+      res.status(500).json({ message: (error as Error).message });
+    }
   }
 };
 
@@ -51,9 +82,22 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
+    if (!userId) {
+      res.status(400).json({ message: 'Missing user ID' });
+      return;
+    }
     const updates = req.body; // Partial updates provided in the request body
     const updatedUser = await userService.updateUser(userId, updates);
-    res.status(200).json(updatedUser);
+    if (updatedUser) {
+      const result = {
+        uuid: updatedUser.uuid,
+        name: updatedUser.name,
+        email: updatedUser.email,
+      };
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
   } catch (error) {
     res.status(422).json({ message: (error as Error).message });
   }
@@ -63,10 +107,23 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
+    if (!userId) {
+      res.status(400).json({ message: 'Missing user ID' });
+      return;
+    }
     const user = await userService.getUserById(userId);
-    res.status(200).json(user);
+    if (user) {
+      const result = {
+        uuid: user.uuid,
+        name: user.name,
+        email: user.email,
+      };
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
   } catch (error) {
-    res.status(422).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 

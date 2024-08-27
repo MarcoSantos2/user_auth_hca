@@ -1,9 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number; // Private ID for internal use
+
+  @PrimaryGeneratedColumn('uuid')
+  uuid!: string;  // Public UUID for external use
 
   @Column({ unique: true })
   email!: string;
@@ -18,11 +21,11 @@ export class User {
   verify: boolean = false;
 
   @CreateDateColumn()
-  created_at: Date = new Date();
+  created_at!: Date;
 
   @UpdateDateColumn()
-  updated_at: Date = new Date();
+  updated_at!: Date;
 
   @DeleteDateColumn()
-  deleted_at: Date | null = null;
+  deleted_at!: Date | null;
 }

@@ -11,7 +11,7 @@ router.get('/', getUsers);
 // Route to handle user creation
 router.post('/', createUser);
 
-// TODO Get individual user by id
+// Get individual user by id
 router.get('/:id', getUserById); 
 
 // Partially updating user information
