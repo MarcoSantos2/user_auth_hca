@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
-import { generateToken } from '../middleware/auth';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -10,9 +9,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await userService.signup({ email, name, sub });
-    const token = generateToken({ id: user.uuid, email: user.email }); // Generate token using UUID and email
-    res.status(201).json({ uuid: user.uuid, name: user.name, email: user.email, token });
+    const token = await userService.signup({ email, name, sub });
+    res.status(201).json({ token });
   } catch (error) {
     if ((error as Error).message.includes('already exists')) {
       res.status(409).json({ message: 'User already exists' });
@@ -43,12 +41,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await userService.getAllUsers();
-    const result = users.map(user => ({
-      uuid: user.uuid,
-      name: user.name,
-      email: user.email,
-    }));
-    res.status(200).json(result);  // Send users' UUID, name, and email as a JSON response
+    res.status(200).json(users);  // Send users' UUID, name, and email as a JSON response
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
@@ -63,12 +56,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       return;
     } 
     const user = await userService.createUser({ name, email, password }); // Call the service layer to create the user
-    const result = {
-      uuid: user.uuid,
-      name: user.name,
-      email: user.email,
-    };
-    res.status(201).json(result); //Respond with the created user's name, UUID, and email
+    res.status(201).json(user); //Respond with the created user's name, UUID, and email
   } catch (error) {
     if ((error as Error).message.includes('already exists')) {
       res.status(409).json({ message: 'User already exists' });

@@ -2,7 +2,7 @@ import { User } from '../models/User'; // Import the shared User interface
 import { hashPassword, comparePassword, generateToken } from '../middleware/auth';
 import * as userRepository from '../repositories/userRepository';
 
-export const signup = async ({ email, name, sub }: { email: string; name: string; sub: string }): Promise<User> => {
+export const signup = async ({ email, name, sub }: { email: string; name: string; sub: string }): Promise<string | null> => {
   // Check if the user already exists in the repository
   const existingUser = await userRepository.findUserByEmail(email);
 
@@ -18,13 +18,16 @@ export const signup = async ({ email, name, sub }: { email: string; name: string
     verify: false,  // Assuming new users are not verified by default
   });
 
-  return newUser;  // Return the full user object including the generated UUID
+  if (newUser) {
+    return generateToken({ uuid: newUser.uuid, email: newUser.email });
+  }
+  return null;  // Return the full user object including the generated UUID
 };
 
 export const signin = async ({ email, sub }: { email: string; sub: string }): Promise<string | null> => {
   const user = await userRepository.findUserByEmail(email);
   if (user && comparePassword(sub, user.password)) {
-    return generateToken({ id: user.id, email: user.email });
+    return generateToken({ uuid: user.uuid, email: user.email });
   }
   return null;
 };

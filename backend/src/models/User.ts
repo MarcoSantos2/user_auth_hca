@@ -1,14 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Index, Generated } from "typeorm";
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id!: number; // Private ID for internal use
 
-  @PrimaryGeneratedColumn('uuid')
+  @Column()
+  @Index({ unique: true })
+  @Generated("uuid")
   uuid!: string;  // Public UUID for external use
-
-  @Column({ unique: true })
+  
+  @Column()
+  @Index({ unique: true })
   email!: string;
 
   @Column()
@@ -18,7 +21,7 @@ export class User {
   password!: string;
 
   @Column({ default: false })
-  verify: boolean = false;
+  verify!: boolean;
 
   @CreateDateColumn()
   created_at!: Date;
@@ -28,4 +31,12 @@ export class User {
 
   @DeleteDateColumn()
   deleted_at!: Date | null;
+
+  toJSON() {
+    return {
+      uuid: this.uuid,
+      name: this.name,
+      email: this.email
+    }
+  }
 }
