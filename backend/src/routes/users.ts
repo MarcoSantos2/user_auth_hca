@@ -5,22 +5,20 @@ import { googleAuth } from '../middleware/auth';
 
 const router = Router();
 
-// Route to handle GET requests for retrieving the list of users
+// Route to handle direct user signin and signup (email and password)
+router.post('/direct/signin', signin);
+router.post('/direct/signup', signup);
+
+// Routes for CRUD operations on users
 router.get('/', getUsers);
-
-// Route to handle user creation
 router.post('/', createUser);
-
-// Get individual user by id
-router.get('/:id', getUserById); 
-
-// Partially updating user information
-router.patch('/:id', updateUser); // ':id' is a parameter to identify the user
-
-// Route for deleting a user
+router.get('/:id', getUserById);
+router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
 
-router.post('/signup', googleAuth, signin);
-router.post('/signin', googleAuth, signup);
+// Route to handle Google Sign-In (sub and email)
+router.post('/signin', googleAuth, signin);
+router.post('/signup', googleAuth, signup);
+
 
 export default router;

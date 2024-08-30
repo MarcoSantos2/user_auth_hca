@@ -24,10 +24,24 @@ export const signup = async ({ email, name, sub }: { email: string; name: string
   return null;  // Return the full user object including the generated UUID
 };
 
-export const signin = async ({ email, sub }: { email: string; sub: string }): Promise<string | null> => {
-  const user = await userRepository.findUserByEmail(email);
-  if (user && comparePassword(sub, user.password)) {
-    return generateToken({ uuid: user.uuid, email: user.email });
+//TODO Move to a new Types file
+interface DirectLoginPayload {
+  email: string;
+  password: string;
+}
+interface ExternalLoginPayload {
+  user: {
+    email: string;
+    sub: string;
+  }
+}
+
+export const signIn = async (payload: DirectLoginPayload | ExternalLoginPayload): Promise<string | null> => {
+  const userEmail = "user" in payload ? payload.user.email : payload.email;
+  const userPassword = "user" in payload ? payload.user.sub : payload.password;
+  const dbUser = await userRepository.findUserByEmail(userEmail);
+  if (dbUser && comparePassword(userPassword, dbUser.password)) {
+    return generateToken({ uuid: dbUser.uuid, email: dbUser.email });
   }
   return null;
 };

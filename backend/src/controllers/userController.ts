@@ -20,18 +20,21 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// As more signin methods are added, this function needs to be updated with the new methods
 export const signin = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, sub } = req.body.user;
-    if (!email || !sub) {
-      res.status(400).json({ message: 'Missing required fields' });
-      return;
-    }
-    const token = await userService.signin({ email, sub });
-    if (token) {
-      res.status(200).json({ token });
+    const { email, password, user } = req.body;
+
+    if (!user && !(email && password)) {
+      res.status(400).json({ message: 'Missing required fields' }); 
     } else {
-      res.status(401).send('Authentication failed');
+      const payload = user ? {user} : {email, password};
+      const token = await userService.signIn(payload);
+      if (token) {
+        res.status(200).json({ token });
+      } else {
+        res.status(401).json({ message: 'Authentification failed' });
+      }
     }
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
