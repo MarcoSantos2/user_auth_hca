@@ -42,6 +42,10 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
+  if (req.user) {
+    console.log(req.user.uuid);  // Now TypeScript knows req.user has a uuid property
+    console.log(req.user.email); // And an email property
+  }
   try {
     const users = await userService.getAllUsers();
     res.status(200).json(users);  // Send users' UUID, name, and email as a JSON response

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getUsers, signup, signin, createUser, updateUser, deleteUser, getUserById } from '../controllers/userController';
 import { googleAuth } from '../middleware/auth';
+import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 
 
 const router = Router();
@@ -10,11 +11,11 @@ router.post('/direct/signin', signin);
 router.post('/direct/signup', signup);
 
 // Routes for CRUD operations on users
-router.get('/', getUsers);
-router.post('/', createUser);
-router.get('/:id', getUserById);
-router.patch('/:id', updateUser);
-router.delete('/:id', deleteUser);
+router.get('/', verifyToken, getUsers);
+router.post('/', verifyToken, createUser); 
+router.get('/:id', verifyToken, getUserById); 
+router.patch('/:id', verifyToken, updateUser);
+router.delete('/:id', verifyToken, deleteUser); 
 
 // Route to handle Google Sign-In (sub and email)
 router.post('/signin', googleAuth, signin);
