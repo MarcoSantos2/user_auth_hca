@@ -1,3 +1,8 @@
 import crypto from 'crypto';
 
-console.log('Random strong secret:', crypto.randomBytes(32).toString('base64'));
+function generateSecret() {
+  const secret = crypto.randomBytes(32).toString('hex');
+  console.log('Your new JWT secret is:', secret);
+}
+
+generateSecret();
