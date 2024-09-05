@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import { UserJwtPayload } from '../types';
-
-
-dotenv.config();
+import { getUserByUuid } from '../services/userService'
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -15,12 +12,17 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
   const token = authHeader.split(' ')[1];
 
-  jwt.verify(token, process.env.JWT_SECRET || '', (err, decoded) => {
+  // Verify if signature and exp is ok. If it is, find user and add to body of request
+  jwt.verify(token, process.env.JWT_SECRET || '', async (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Invalid or expired token' });
     }
-
-    req.user = decoded as UserJwtPayload; // Ensure req.user is typed correctly
-    next();
+    try {
+      const user = await getUserByUuid((decoded as UserJwtPayload).uuid);
+      req.body.user = user;
+      next();
+    } catch (error) {
+        return res.status(401).json({ message: 'Invalid user' });
+    }   
   });
 };

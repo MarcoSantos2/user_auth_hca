@@ -97,12 +97,12 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 // Extract the user ID from the URL parameters and new data from the request body, then call the service layer to apply the updates
 export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.params.id;
-    if (!userId) {
+    const userUuid = req.params.id;
+    if (!userUuid) {
       res.status(400).json({ message: 'Missing user ID' });
       return;
     }
-    const user = await userService.getUserById(userId);
+    const user = await userService.getUserByUuid(userUuid);
     if (user) {
       const result = {
         uuid: user.uuid,

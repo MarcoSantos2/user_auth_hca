@@ -57,8 +57,8 @@ export const createUser = async ({ name, email, password }: { name: string; emai
   return user;
 };
 
-export const updateUser = async (id: string, updates: Partial<User>) => {
-  const user = await userRepository.findUserById(id);
+export const updateUser = async (uuid: string, updates: Partial<User>) => {
+  const user = await userRepository.findUserByUuid(uuid);
   if (!user) {
     throw new Error('User not found');
   }
@@ -70,8 +70,17 @@ export const updateUser = async (id: string, updates: Partial<User>) => {
   return await userRepository.saveUser(user);
 };
 
-// Find User By Id
-export const getUserById = async (id: string) => {
+// Find User By UUID
+export const getUserByUuid = async (uuid: string) => {
+  const user = await userRepository.findUserByUuid(uuid);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  return user;
+};
+
+// Find User By ID
+export const getUserById = async (id: number) => {
   const user = await userRepository.findUserById(id);
   if (!user) {
     throw new Error('User not found');
@@ -80,10 +89,10 @@ export const getUserById = async (id: string) => {
 };
 
 // This function will delete the user from the DB
-export const deleteUser = async (id: string): Promise<void> => {
-  const user = await userRepository.findUserById(id);
+export const deleteUser = async (uuid: string): Promise<void> => {
+  const user = await userRepository.findUserByUuid(uuid);
   if (!user) {
     throw new Error('User not found');
   }
-  await userRepository.deleteUser(id);
+  await userRepository.deleteUser(uuid);
 };

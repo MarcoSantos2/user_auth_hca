@@ -11,8 +11,14 @@ export const findAllUsers = async (): Promise<User[]> => {
   return await userRepository.find();
 };
 
-export const findUserById = async (uuid: string): Promise<User | null> => {
-  return await userRepository.findOne({ where: { uuid } });
+export const findUserById = async (id: number): Promise<User | null> => {
+  return await userRepository.findOneBy({id});
+};
+
+export const findUserByUuid = async (uuid: string): Promise<User | null> => {
+  return await userRepository.createQueryBuilder('user')
+  .where("user.uuid = :uuid", { uuid: uuid })
+  .getOne()
 };
 
 export const saveUser = async (user: Partial<User>): Promise<User> => {
