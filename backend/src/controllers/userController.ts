@@ -1,3 +1,5 @@
+// Management of the API interface to the business logic
+
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 
@@ -124,6 +126,39 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     const userId = req.params.id;
     await userService.deleteUser(userId);
     res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+// The next 3 funtions will handle functionality in the User_Role table.
+
+export const assignRole = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId, roleId } = req.body;
+    await userService.assignRoleToUser(Number(userId), Number(roleId));
+    res.status(201).json({ message: 'Role assigned to user successfully' });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const getUserRoles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const userRoles = await userService.getUserRoles(Number(userId));
+    const roleNames = userRoles.map(userRole => userRole.role.name);
+    res.status(200).json({ message: `Roles: ${roleNames.join(', ')}` });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const removeUserRole = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId, roleId } = req.body;
+    await userService.removeUserRole(Number(userId), Number(roleId));
+    res.status(200).json({ message: 'Role removed from user successfully' });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }

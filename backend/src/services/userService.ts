@@ -1,6 +1,12 @@
+// Business logic implementation
+
 import { User } from '../models/User'; // Import the shared User interface
 import { hashPassword, comparePassword, generateToken } from '../middleware/auth';
 import * as userRepository from '../repositories/userRepository';
+import { UserRole } from "../models/UserRole";
+import * as userRoleRepository from "../repositories/userRoleRepository";
+import * as roleRepository from '../repositories/roleRepository';
+
 
 export const signup = async ({ email, name, sub }: { email: string; name: string; sub: string }): Promise<string | null> => {
   // Check if the user already exists in the repository
@@ -95,4 +101,37 @@ export const deleteUser = async (uuid: string): Promise<void> => {
     throw new Error('User not found');
   }
   await userRepository.deleteUser(uuid);
+};
+
+// The next 3 funtions will handle functionality in the User_Role table.
+
+export const assignRoleToUser = async (userId: number, roleId: number): Promise<UserRole> => {
+  const user = await userRepository.findUserById(userId);
+  if (!user) {
+    throw new Error(`User with ID ${userId} not found`);
+  }
+
+  const role = await roleRepository.findRoleById(roleId);
+  if (!role) {
+    throw new Error(`Role with ID ${roleId} not found`);
+  }
+
+  return await userRoleRepository.saveUserRole({ user, role });
+};
+
+export const getUserRoles = async (userId: number): Promise<UserRole[]> => {
+  const user = await userRoleRepository.findUserById(userId);
+  if (!user) {
+    throw new Error(`User with ID ${userId} not found`);
+  }
+  return await userRoleRepository.findUserRolesByUserId(userId);
+};
+
+export const removeUserRole = async (userId: number, roleId: number): Promise<void> => {
+  const userRoles = await userRoleRepository.findUserRolesByUserId(userId);
+  const userRole = userRoles.find(ur => ur.role.id === roleId);
+  if (!userRole) {  
+    throw new Error(`UserRole with User ID ${userId} and Role ID ${roleId} not found`);
+  }
+  await userRoleRepository.deleteUserRole(userRole.id);
 };
