@@ -3,8 +3,8 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import userRoutes from './routes/users';
+import roleRoutes from './routes/roles';
 import { AppDataSource } from "./datasource";
-import { assignRoleToUser } from './controllers/roleController';
 
 dotenv.config();
 
@@ -22,8 +22,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // User routes - map /api/users to userRoutes
-app.use('/:slug/add/user/:uuid', assignRoleToUser);
 app.use('/api/users', userRoutes);
+app.use('/api/roles', roleRoutes);
 
 // Serve the Google Sign-In HTML file dynamically
 app.get('/', (req: Request, res: Response) => {

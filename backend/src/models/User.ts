@@ -1,4 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, Index, Generated } from "typeorm";
+import { 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Column, 
+  ManyToMany, 
+  JoinTable, 
+  CreateDateColumn, 
+  UpdateDateColumn, 
+  DeleteDateColumn, 
+  Index, 
+  Generated 
+} from "typeorm";
+import { Role } from "./Role";
 
 @Entity()
 export class User {
@@ -23,6 +35,10 @@ export class User {
   @Column({ default: false })
   verify!: boolean;
 
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable()
+  roles!: Role[];
+
   @CreateDateColumn()
   created_at!: Date;
 
@@ -36,7 +52,8 @@ export class User {
     return {
       uuid: this.uuid,
       name: this.name,
-      email: this.email
+      email: this.email,
+      roles: this.roles
     }
   }
 }

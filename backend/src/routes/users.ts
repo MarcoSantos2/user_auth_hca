@@ -1,31 +1,36 @@
 import { Router } from 'express';
-import { getUsers, signup, signin, createUser, updateUser, deleteUser, 
-         getUserById, assignRole, getUserRoles, removeUserRole } from '../controllers/userController';
+import { 
+        getUsers, 
+        signup, 
+        signin, 
+        createUser, 
+        updateUser, 
+        deleteUser, 
+        getUserById,
+        addRoleToUser
+        } from '../controllers/userController';
 import { googleAuth } from '../middleware/auth';
 import { verifyToken } from '../middleware/authMiddleware';
 
-
 const router = Router();
 
-// Route to handle direct user signin and signup (email and password)
-router.post('/direct/signin', signin);
-router.post('/direct/signup', signup);
+// base route: /api/users
 
-// User Role and Role Assignment Routes
-router.post('/assign-role', verifyToken, assignRole);
-router.get('/:userId/roles', verifyToken, getUserRoles);
-router.delete('/remove-role', verifyToken, removeUserRole);
+// Routes for Utility Requests
+router.get('/', verifyToken, getUsers);
+router.get('/:uuid/add/role/:slug', verifyToken, addRoleToUser);
 
 // Routes for CRUD operations on users
-router.get('/', verifyToken, getUsers);
-router.post('/', verifyToken, createUser); 
-router.get('/:id', verifyToken, getUserById); 
-router.patch('/:id', verifyToken, updateUser);
-router.delete('/:id', verifyToken, deleteUser); 
+router.post('/', verifyToken, createUser); // Create
+router.get('/:id', verifyToken, getUserById); // Read
+router.patch('/:id', verifyToken, updateUser); // Update
+router.delete('/:id', verifyToken, deleteUser); // Delete
 
 // Route to handle Google Sign-In (sub and email)
 router.post('/signin', googleAuth, signin);
 router.post('/signup', googleAuth, signup);
-
+// Route to handle direct user signin and signup (email and password)
+router.post('/direct/signin', signin);
+router.post('/direct/signup', signup);
 
 export default router;

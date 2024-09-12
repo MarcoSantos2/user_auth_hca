@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
+import { 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Column, 
+  ManyToMany, 
+  CreateDateColumn, 
+  UpdateDateColumn, 
+  DeleteDateColumn, 
+  Index 
+} from "typeorm";
+import { User } from "./User";
 
 @Entity()
 export class Role {
@@ -6,7 +16,6 @@ export class Role {
   id!: number;
 
   @Column()
-  @Index({ unique: true })
   name!: string;
 
   @Column({ type: 'text', nullable: true })
@@ -16,9 +25,15 @@ export class Role {
   @Index({ unique: true })
   slug!: string;
 
+  @ManyToMany(() => User, (user: User) => user.roles)
+  users!: User[];
+
   @CreateDateColumn()
   created_at!: Date;
 
   @UpdateDateColumn()
   updated_at!: Date;
+
+  @DeleteDateColumn()
+  deleted_at!: Date | null;
 }

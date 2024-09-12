@@ -1,10 +1,6 @@
 // Management of the API interface to the business logic
-
 import { Request, Response } from 'express';
 import * as roleService from '../services/roleService';
-import * as userService from '../services/userService';
-
-// TODO ADD ALL FUNCTIONALITY FROM USERROLECONTROLLER TO ROLECONTROLLER.TS
 
 export const createRole = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -16,10 +12,31 @@ export const createRole = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
+export const updateRole = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { slug } = req.params;
+    const { name, description, slug: newSlug } = req.body;
+    const role = await roleService.updateRole(slug, { name, description, slug: newSlug });
+    res.status(201).json(role);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
 export const getRoles = async (req: Request, res: Response): Promise<void> => {
   try {
     const roles = await roleService.getAllRoles();
-    res.status(200).json(roles);
+    res.status(200).json({roles});
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const getRole = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { slug } = req.params;
+    const role = await roleService.getRoleBySlug(slug, true);
+    res.status(200).json(role);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
@@ -27,32 +44,19 @@ export const getRoles = async (req: Request, res: Response): Promise<void> => {
 
 export const deleteRole = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
-    await roleService.deleteRole(Number(id));
+    const { slug } = req.params;
+    await roleService.deleteRole(slug);
     res.status(200).json({ message: 'Role deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
 };
 
-export const assignRoleToUser = async (req: Request, res: Response): Promise<void> => {
+export const addUserToRole = async (req: Request, res: Response): Promise<void> => {
   try {
     const { slug, uuid } = req.params;
-    const user = await userService.getUserByUuid(uuid);
-    const role = await roleService.getRoleBySlug(slug);
-
-    if (!user) {
-      res.status(404).json({ message: 'User not found' });
-      return;
-    }
-
-    if (!role) {
-      res.status(404).json({ message: 'Role not found' });
-      return;
-    }
-
-    await userService.assignRoleToUser(user.id, role.id);
-    res.status(201).json({ message: 'Role assigned to user successfully' });
+    const role = await roleService.addUserToRole(uuid, slug);
+    res.status(201).json(role);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }

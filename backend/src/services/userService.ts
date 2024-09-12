@@ -3,9 +3,7 @@
 import { User } from '../models/User'; // Import the shared User interface
 import { hashPassword, comparePassword, generateToken } from '../middleware/auth';
 import * as userRepository from '../repositories/userRepository';
-import { UserRole } from "../models/UserRole";
-import * as userRoleRepository from "../repositories/userRoleRepository";
-import * as roleRepository from '../repositories/roleRepository';
+import * as roleService from '../services/roleService';
 
 
 export const signup = async ({ email, name, sub }: { email: string; name: string; sub: string }): Promise<string | null> => {
@@ -17,7 +15,7 @@ export const signup = async ({ email, name, sub }: { email: string; name: string
   }
 
   // Create and save the new user using TypeORM
-  const newUser = await userRepository.saveUser({
+  const newUser = await userRepository.createUser({
     email,
     name,
     password: hashPassword(sub),  // Hash the password
@@ -53,13 +51,13 @@ export const signIn = async (payload: DirectLoginPayload | ExternalLoginPayload)
 };
 
 //async added in case we need to add more logic that includes async operations in the future
-export const getAllUsers = async (): Promise<User[]> => { 
-  return userRepository.findAllUsers();
+export const getAllUsers = async (withRoles?: boolean): Promise<User[]> => { 
+  return userRepository.findAllUsers(withRoles);
 };
 
 export const createUser = async ({ name, email, password }: { name: string; email: string; password: string }): Promise<User> => {
   const hashedPassword = hashPassword(password);
-  const user = await userRepository.saveUser({ name, email, password: hashedPassword });
+  const user = await userRepository.createUser({ name, email, password: hashedPassword });
   return user;
 };
 
@@ -77,8 +75,8 @@ export const updateUser = async (uuid: string, updates: Partial<User>) => {
 };
 
 // Find User By UUID
-export const getUserByUuid = async (uuid: string) => {
-  const user = await userRepository.findUserByUuid(uuid);
+export const getUserByUuid = async (uuid: string, withRoles?: boolean) => {
+  const user = await userRepository.findUserByUuid(uuid, withRoles);
   if (!user) {
     throw new Error('User not found');
   }
@@ -103,35 +101,19 @@ export const deleteUser = async (uuid: string): Promise<void> => {
   await userRepository.deleteUser(uuid);
 };
 
-// The next 3 funtions will handle functionality in the User_Role table.
-
-export const assignRoleToUser = async (userId: number, roleId: number): Promise<UserRole> => {
-  const user = await userRepository.findUserById(userId);
+export const addRoleToUser = async (userUuid: string, roleSlug: string): Promise<User> => {
+  const user = await getUserByUuid(userUuid, true);
+  const role = await roleService.getRoleBySlug(roleSlug);
   if (!user) {
-    throw new Error(`User with ID ${userId} not found`);
+    throw new Error(`User with Uuid ${userUuid} not found`);
   }
-
-  const role = await roleRepository.findRoleById(roleId);
   if (!role) {
-    throw new Error(`Role with ID ${roleId} not found`);
+    throw new Error(`Role with Slug ${roleSlug} not found`);
   }
 
-  return await userRoleRepository.saveUserRole({ user, role });
-};
-
-export const getUserRoles = async (userId: number): Promise<UserRole[]> => {
-  const user = await userRoleRepository.findUserById(userId);
-  if (!user) {
-    throw new Error(`User with ID ${userId} not found`);
+  if (!user.roles.some(r => r.id === role.id)) {
+    user.roles.push(role);
   }
-  return await userRoleRepository.findUserRolesByUserId(userId);
-};
 
-export const removeUserRole = async (userId: number, roleId: number): Promise<void> => {
-  const userRoles = await userRoleRepository.findUserRolesByUserId(userId);
-  const userRole = userRoles.find(ur => ur.role.id === roleId);
-  if (!userRole) {  
-    throw new Error(`UserRole with User ID ${userId} and Role ID ${roleId} not found`);
-  }
-  await userRoleRepository.deleteUserRole(userRole.id);
+  return await userRepository.saveUser(user);
 };

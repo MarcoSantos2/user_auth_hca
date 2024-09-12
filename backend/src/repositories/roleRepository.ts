@@ -12,18 +12,32 @@ export const findRoleById = async (id: number): Promise<Role | null> => {
   };
 
 export const findAllRoles = async (): Promise<Role[]> => {
-  return await roleRepository.find();
+  return await roleRepository.createQueryBuilder('role')
+  .leftJoinAndSelect("role.users", "user")
+  .getMany();
 };
 
-export const saveRole = async (role: Partial<Role>): Promise<Role> => {
+export const createRole = async (role: Partial<Role>): Promise<Role> => {
   const newRole = roleRepository.create(role);
   return await roleRepository.save(newRole);
 };
 
-export const deleteRole = async (id: number): Promise<void> => {
-  await roleRepository.delete(id);
+export const saveRole = async (role: Role): Promise<Role> => {
+  return await roleRepository.save(role);
 };
 
-export const findRoleBySlug = async (slug: string): Promise<Role | null> => {
-  return await roleRepository.findOne({ where: { slug } });
+export const deleteRole = async (slug: string): Promise<void> => {
+  await roleRepository.softDelete({ slug });
+};
+
+export const findRoleBySlug = async (slug: string, withUsers = false): Promise<Role | null> => {
+  const query = roleRepository
+    .createQueryBuilder('role')
+    .where("role.slug = :slug", { slug: slug });
+
+  if (withUsers) {
+    query.leftJoinAndSelect("role.users", "user");
+  }
+
+  return await query.getOne();
 };
