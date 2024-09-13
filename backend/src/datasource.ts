@@ -2,11 +2,13 @@
 
 import dotenv from 'dotenv';
 import "reflect-metadata";
-import { DataSource } from "typeorm";
+import { DataSource, LogLevel } from "typeorm";
+import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 dotenv.config();
 
-export const AppDataSource = new DataSource({
+const logging = (process.env.LOGGING as string).split(',')
+export const dataSourceOptions: MysqlConnectionOptions = {
   type: 'mysql',
   host: process.env.DB_HOSTNAME || "localhost",
   port: Number(process.env.DB_PORT) || 3306,
@@ -14,7 +16,9 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME || "health_care_aide",
   synchronize: false,
-  logging: true,
+  logging: logging as LogLevel[],
   entities: ["src/models/**/*.ts"],
   migrations: ["src/migrations/**/*.ts"]
-});
+}
+
+export const AppDataSource = new DataSource(dataSourceOptions);

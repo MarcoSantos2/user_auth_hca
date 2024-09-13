@@ -9,9 +9,11 @@
     "dev": "nodemon src/index.ts",
     "generate:secret": "ts-node src/scripts/generateRandomSecret.ts",
     "decode:jwt": "ts-node src/scripts/decodeJWT.ts",
-    "test": "",
-    "migrations": "npx typeorm-ts-node-commonjs migration:run -d ./src/datasource.ts",
-    "migration:create": "npx typeorm migration:create",
+    "test": "jest",
+    "create:db": "ts-node src/scripts/createDb.ts",
+    "migrations": "npm run create:db && npx typeorm-ts-node-commonjs migration:run -d ./src/datasource.ts",
+    "migrations:revert": "npx typeorm-ts-node-commonjs migration:revert -d ./src/datasource.ts",
+    "migrations:create": "npx typeorm migration:create",
     "smile": "ts-node src/scripts/smile.ts"
   },
   "repository": {
