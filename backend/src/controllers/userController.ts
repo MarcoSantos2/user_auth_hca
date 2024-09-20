@@ -2,16 +2,30 @@
 
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
+import { UserData } from '../types';
+
+
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, name, sub } = req.body.user;
-    if (!email || !name || !sub) {
+    const { email, name, sub, password } = req.body.user || req.body;
+
+    if (!email || (!password && !sub)) {
       res.status(400).json({ message: 'Missing required fields' });
       return;
     }
 
-    const token = await userService.signup({ email, name, sub });
+    const userData: UserData = { email, name };
+
+    if (sub) {
+      userData.sub = sub;
+      userData.googleId = sub;
+      userData.picture = req.body.user.picture;
+    } else {
+      userData.password = password;
+    }
+
+    const token = await userService.signup(userData);
     res.status(201).json({ token });
   } catch (error) {
     if ((error as Error).message.includes('already exists')) {
@@ -27,21 +41,21 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, user } = req.body;
 
-    if (!user && !(email && password)) {
-      res.status(400).json({ message: 'Missing required fields' }); 
+    if (user) {
+      const { email: userEmail, sub } = user;
+      const token = await userService.signIn({ email: userEmail, sub });
+      res.status(200).json({ token });
+    } else if (email && password) {
+      const token = await userService.signIn({ email, password });
+      res.status(200).json({ token });
     } else {
-      const payload = user ? {user} : {email, password};
-      const token = await userService.signIn(payload);
-      if (token) {
-        res.status(200).json({ token });
-      } else {
-        res.status(401).json({ message: 'Authentification failed' });
-      }
+      res.status(400).json({ message: 'Missing required fields' });
     }
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    res.status(401).json({ message: (error as Error).message });
   }
 };
+
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {

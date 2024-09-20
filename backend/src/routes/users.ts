@@ -9,7 +9,7 @@ import {
         getUserById,
         addRoleToUser
         } from '../controllers/userController';
-import { googleAuth } from '../middleware/auth';
+import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken } from '../middleware/authMiddleware';
 
 const router = Router();

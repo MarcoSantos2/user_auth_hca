@@ -26,14 +26,20 @@ export class User {
   @Index({ unique: true })
   email!: string;
 
-  @Column()
+  @Column({ nullable: true })
   name!: string;
 
-  @Column()
-  password!: string;
+  @Column({ nullable: true })
+  password?: string;
 
   @Column({ default: false })
   verify!: boolean;
+
+  @Column({ nullable: true })
+  googleId?: string;
+
+  @Column({ nullable: true })
+  picture?: string;
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()

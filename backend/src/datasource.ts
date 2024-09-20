@@ -7,7 +7,9 @@ import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOpti
 
 dotenv.config();
 
-const logging = (process.env.LOGGING as string).split(',')
+const logging = (process.env.LOGGING || '').split(',');
+
+
 export const dataSourceOptions: MysqlConnectionOptions = {
   type: 'mysql',
   host: process.env.DB_HOSTNAME || "localhost",

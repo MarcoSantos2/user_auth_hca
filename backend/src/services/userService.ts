@@ -1,53 +1,89 @@
 // Business logic implementation
 
 import { User } from '../models/User'; // Import the shared User interface
-import { hashPassword, comparePassword, generateToken } from '../middleware/auth';
+import { hashPassword, comparePassword, generateToken } from '../middleware/googleAuth';
 import * as userRepository from '../repositories/userRepository';
 import * as roleService from '../services/roleService';
+import { v4 as uuidv4 } from 'uuid';
+import * as googlePayloadRepository from '../repositories/googlePayload';
+import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 
+function randomPassword(length: number = 12): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
 
-export const signup = async ({ email, name, sub }: { email: string; name: string; sub: string }): Promise<string | null> => {
-  // Check if the user already exists in the repository
+export const signup = async (userData: UserData): Promise<string | null> => {
+  const { email, name, password, googleId, picture } = userData;
+
+  // Check if the user already exists
   const existingUser = await userRepository.findUserByEmail(email);
 
   if (existingUser) {
     throw new Error('User already exists');
   }
 
-  // Create and save the new user using TypeORM
-  const newUser = await userRepository.createUser({
-    email,
-    name,
-    password: hashPassword(sub),  // Hash the password
-    verify: false,  // Assuming new users are not verified by default
-  });
+  let newUser;
+  if (googleId) {
+    // Google Sign-Up
+    newUser = await userRepository.createUser({
+      email,
+      name,
+      googleId,
+      password: undefined, // Password is not needed for Google users
+      verify: true,
+    });
+  } else {
+    // Direct Sign-Up
+    if (!password) {
+      throw new Error('Password is required for direct sign-up');
+    }
+    newUser = await userRepository.createUser({
+      email,
+      name,
+      password: hashPassword(password),
+      verify: false,
+    });
+  }
 
   if (newUser) {
     return generateToken({ uuid: newUser.uuid, email: newUser.email });
   }
-  return null;  // Return the full user object including the generated UUID
+  return null;
 };
 
-//TODO Move to a new Types file
-interface DirectLoginPayload {
-  email: string;
-  password: string;
-}
-interface ExternalLoginPayload {
-  user: {
-    email: string;
-    sub: string;
-  }
+/*
+Using a type guard function - type-safe and scalable solution. It provides clarity to 
+TypeScript about the types and ensures that you're handling each payload type appropriately.
+*/
+function isExternalLoginPayload(payload: DirectLoginPayload | ExternalLoginPayload): payload is ExternalLoginPayload {
+  return 'googleId' in payload;
 }
 
 export const signIn = async (payload: DirectLoginPayload | ExternalLoginPayload): Promise<string | null> => {
-  const userEmail = "user" in payload ? payload.user.email : payload.email;
-  const userPassword = "user" in payload ? payload.user.sub : payload.password;
-  const dbUser = await userRepository.findUserByEmail(userEmail);
-  if (dbUser && comparePassword(userPassword, dbUser.password)) {
-    return generateToken({ uuid: dbUser.uuid, email: dbUser.email });
+  if (isExternalLoginPayload(payload)) {
+    // Google Sign-In
+    const { email, googleId } = payload;
+    const dbUser = await userRepository.findUserByEmail(email);
+
+    if (dbUser && dbUser.googleId === googleId) {
+      return generateToken({ uuid: dbUser.uuid, email: dbUser.email });
+    }
+    throw new Error('Google user not found');
+  } else {
+    // Direct Sign-In
+    const { email, password } = payload;
+    const dbUser = await userRepository.findUserByEmail(email);
+
+    if (dbUser && dbUser.password && comparePassword(password, dbUser.password)) {
+      return generateToken({ uuid: dbUser.uuid, email: dbUser.email });
+    }
+    throw new Error('Invalid credentials');
   }
-  return null;
 };
 
 //async added in case we need to add more logic that includes async operations in the future
