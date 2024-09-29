@@ -31,7 +31,7 @@ export async function googleAuth(req: Request, res: Response, next: NextFunction
     req.body.user = {
       email: payload.email,
       name: payload.name || '',
-      sub: payload.sub,
+      googleId: payload.sub,
       picture: payload.picture || '',
     };
 
@@ -54,3 +54,4 @@ export const hashPassword = (password: string) => {
 export const comparePassword = (password: string, hash: string) => {
     return bcrypt.compareSync(password, hash);
   };
+  

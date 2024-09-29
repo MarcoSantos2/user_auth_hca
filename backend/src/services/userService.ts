@@ -1,42 +1,44 @@
 // Business logic implementation
-
+import crypto from 'crypto';
 import { User } from '../models/User'; // Import the shared User interface
 import { hashPassword, comparePassword, generateToken } from '../middleware/googleAuth';
 import * as userRepository from '../repositories/userRepository';
+import * as googleRepository from '../repositories/googleAccountRepository';
 import * as roleService from '../services/roleService';
-import { v4 as uuidv4 } from 'uuid';
-import * as googlePayloadRepository from '../repositories/googlePayload';
 import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
-
-function randomPassword(length: number = 12): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
+import { GoogleAccount } from '../models/GoogleAccount';
 
 export const signup = async (userData: UserData): Promise<string | null> => {
-  const { email, name, password, googleId, picture } = userData;
+  const { email, name, password, googleId } = userData;
 
   // Check if the user already exists
-  const existingUser = await userRepository.findUserByEmail(email);
+  let existingUser: User|null;
+  if (googleId) {
+    const existingGoogle = await googleRepository.findGoogleAccountByEmail(email);
+    existingUser = existingGoogle ? existingGoogle.user : null;
+  } else {
+    existingUser = await userRepository.findUserByEmail(email);
+  }
 
   if (existingUser) {
     throw new Error('User already exists');
   }
 
-  let newUser;
+  let newUser: User;
   if (googleId) {
     // Google Sign-Up
     newUser = await userRepository.createUser({
       email,
       name,
-      googleId,
-      password: undefined, // Password is not needed for Google users
+      password: hashPassword(crypto.randomBytes(32).toString('hex')),
       verify: true,
     });
+
+    const googleAccount = new GoogleAccount();
+    googleAccount.email = email;
+    googleAccount.google_id = googleId;
+    googleAccount.user = newUser;
+    await googleRepository.createGoogleAccount(googleAccount);
   } else {
     // Direct Sign-Up
     if (!password) {
@@ -68,9 +70,12 @@ export const signIn = async (payload: DirectLoginPayload | ExternalLoginPayload)
   if (isExternalLoginPayload(payload)) {
     // Google Sign-In
     const { email, googleId } = payload;
-    const dbUser = await userRepository.findUserByEmail(email);
 
-    if (dbUser && dbUser.googleId === googleId) {
+    const existingGoogle = await googleRepository.findGoogleAccountByEmail(email);
+    const dbUser = existingGoogle ? existingGoogle.user : null;
+    const isValidGoogleAccount = existingGoogle?.google_id === googleId;
+
+    if (dbUser && isValidGoogleAccount) {
       return generateToken({ uuid: dbUser.uuid, email: dbUser.email });
     }
     throw new Error('Google user not found');

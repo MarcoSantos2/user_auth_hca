@@ -3,8 +3,16 @@ import { User } from "../models/User";
 
 const userRepository = AppDataSource.getRepository(User);
 
-export const findUserByEmail = async (email: string): Promise<User | null> => {
-  return await userRepository.findOne({ where: { email } });
+export const findUserByEmail = async (email: string, withGoogle: boolean = false): Promise<User | null> => {
+  const query = userRepository
+  .createQueryBuilder('user')
+  .where("user.email = :email", { email: email });
+
+  if (withGoogle) {
+    query.leftJoinAndSelect("user.google_accounts", "google_accounts");
+  }
+
+  return await query.getOne();
 };
 
 export const findAllUsers = async (withRoles: boolean = false): Promise<User[]> => {

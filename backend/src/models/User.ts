@@ -3,7 +3,8 @@ import {
   PrimaryGeneratedColumn, 
   Column, 
   ManyToMany, 
-  JoinTable, 
+  JoinTable,
+  OneToMany,
   CreateDateColumn, 
   UpdateDateColumn, 
   DeleteDateColumn, 
@@ -11,6 +12,7 @@ import {
   Generated 
 } from "typeorm";
 import { Role } from "./Role";
+import { GoogleAccount } from "./GoogleAccount";
 
 @Entity()
 export class User {
@@ -35,15 +37,12 @@ export class User {
   @Column({ default: false })
   verify!: boolean;
 
-  @Column({ nullable: true })
-  googleId?: string;
-
-  @Column({ nullable: true })
-  picture?: string;
-
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()
   roles!: Role[];
+
+  @OneToMany(() => GoogleAccount, (google) => google.user)
+  google_accounts!: GoogleAccount[]
 
   @CreateDateColumn()
   created_at!: Date;

@@ -6,7 +6,7 @@ import { Entity,
 import { User } from "./User";
 
 @Entity()
-export class GooglePayload {
+export class GoogleAccount {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -16,14 +16,7 @@ export class GooglePayload {
   @Column()
   email!: string;
 
-  @Column()
-  sub!: string;
-
-  @Column()
-  user_id!: string;
-
-  @ManyToOne(() => User, user => user.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.google_accounts)
   @JoinColumn({ name: 'user_id' })
   user!: User;
 }
-

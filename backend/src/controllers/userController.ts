@@ -4,22 +4,19 @@ import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserData } from '../types';
 
-
-
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, name, sub, password } = req.body.user || req.body;
+    const { email, name, googleId, password } = req.body.user || req.body;
 
-    if (!email || (!password && !sub)) {
+    if (!email || (!password && !googleId)) {
       res.status(400).json({ message: 'Missing required fields' });
       return;
     }
 
     const userData: UserData = { email, name };
 
-    if (sub) {
-      userData.sub = sub;
-      userData.googleId = sub;
+    if (googleId) {
+      userData.googleId = googleId;
       userData.picture = req.body.user.picture;
     } else {
       userData.password = password;
@@ -42,8 +39,8 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
     const { email, password, user } = req.body;
 
     if (user) {
-      const { email: userEmail, sub } = user;
-      const token = await userService.signIn({ email: userEmail, sub });
+      const { email: userEmail, googleId } = user;
+      const token = await userService.signIn({ email: userEmail, googleId });
       res.status(200).json({ token });
     } else if (email && password) {
       const token = await userService.signIn({ email, password });
