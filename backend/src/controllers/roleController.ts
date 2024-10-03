@@ -61,3 +61,24 @@ export const addUserToRole = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+export const addPermissionToRole = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { slug, permission_slug } = req.params;
+    const role = await roleService.addPermissionToRole(permission_slug, slug);
+    res.status(201).json(role);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const addPermissionsToRole = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { slug } = req.params;
+    const { permissions } = req.body;
+    const role = await roleService.addPermissionsToRole(permissions, slug);
+    res.status(201).json(role);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};

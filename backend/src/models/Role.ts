@@ -1,7 +1,8 @@
 import { 
   Entity, 
   PrimaryGeneratedColumn, 
-  Column, 
+  Column,
+  JoinTable,
   ManyToMany, 
   CreateDateColumn, 
   UpdateDateColumn, 
@@ -9,6 +10,7 @@ import {
   Index 
 } from "typeorm";
 import { User } from "./User";
+import { Permission } from "./Permission";
 
 @Entity()
 export class Role {
@@ -27,6 +29,10 @@ export class Role {
 
   @ManyToMany(() => User, (user: User) => user.roles)
   users!: User[];
+
+  @ManyToMany(() => Permission, (permission) => permission.roles)
+  @JoinTable()
+  permissions!: Permission[];
 
   @CreateDateColumn()
   created_at!: Date;
