@@ -1,13 +1,16 @@
 // Management of the API interface to the business logic
 import { Request, Response } from 'express';
 import * as roleService from '../services/roleService';
+import logger from '../utils/logger';
 
 export const createRole = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, description, slug } = req.body;
     const role = await roleService.createRole({ name, description, slug });
+    logger.info(`Role created: ${name}`);
     res.status(201).json(role);
   } catch (error) {
+    logger.error(`Role creation error: ${(error as Error).message}`);
     res.status(500).json({ message: (error as Error).message });
   }
 };

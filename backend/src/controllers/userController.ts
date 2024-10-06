@@ -3,6 +3,7 @@
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserData } from '../types';
+import logger from '../utils/logger';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -23,8 +24,10 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     }
 
     const token = await userService.signup(userData);
+    logger.info(`User signed up: ${email}`);
     res.status(201).json({ token });
   } catch (error) {
+    logger.error(`Signup error: ${(error as Error).message}`);
     if ((error as Error).message.includes('already exists')) {
       res.status(409).json({ message: 'User already exists' });
     } else {
@@ -41,14 +44,17 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
     if (user) {
       const { email: userEmail, googleId } = user;
       const token = await userService.signIn({ email: userEmail, googleId });
+      logger.info(`User signed in with Google: ${userEmail}`);
       res.status(200).json({ token });
     } else if (email && password) {
       const token = await userService.signIn({ email, password });
+      logger.info(`User signed in: ${email}`);
       res.status(200).json({ token });
     } else {
       res.status(400).json({ message: 'Missing required fields' });
     }
   } catch (error) {
+    logger.error(`Signin error: ${(error as Error).message}`);
     res.status(401).json({ message: (error as Error).message });
   }
 };

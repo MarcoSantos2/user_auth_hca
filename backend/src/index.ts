@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/users';
 import roleRoutes from './routes/roles';
 import { AppDataSource } from "./datasource";
+import { getAllPermissions } from './services/permissionService'; // Adjust the import based on your structure
+
 
 dotenv.config();
 
@@ -28,6 +30,16 @@ app.use('/api/roles', roleRoutes);
 // Serve the Google Sign-In HTML file dynamically
 app.get('/', (req: Request, res: Response) => {
   res.render('index', { googleClientId: process.env.GOOGLE_CLIENT_ID });
+});
+
+// Define the route for getting all permissions
+app.get('/api/permissions', async (req, res) => {
+  try {
+    const permissions = await getAllPermissions();
+    res.json(permissions);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // Start the server AND initialize TypeORM
