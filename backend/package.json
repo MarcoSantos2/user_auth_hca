@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",
+    "clean": "rimraf dist && rimraf build",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "generate:secret": "ts-node src/scripts/generateRandomSecret.ts",

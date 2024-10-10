@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserJwtPayload } from '../types';
-import { getUserByUuid } from '../services/userService'
+import { getUserByUuid } from '../services/userService';
+import * as permissionService from '../services/permissionService';
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -18,11 +19,35 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({ message: 'Invalid or expired token' });
     }
     try {
-      const user = await getUserByUuid((decoded as UserJwtPayload).uuid);
+      const user = await getUserByUuid((decoded as UserJwtPayload).uuid, true);
       req.body.user = user;
       next();
     } catch (error) {
         return res.status(401).json({ message: 'Invalid user' });
     }   
   });
+};
+
+export const verifyPermissions = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Build the endpoint string
+
+    const method = req.method; // e.g., "GET", "POST"
+    const baseUrl = req.baseUrl; //TBD baseUrl or originalUrl // e.g., "/api/roles"
+    const routePath = req.route.path;
+    const fullPath = `${baseUrl}${routePath}`.replace(/\/$/, "");
+    const endpoint = `${method}:${fullPath}`; // Adjust this if you are using slugs differently
+   
+    // Check if the user has permission for this endpoint
+    const permissions = await permissionService.findPermissionsByRoles(req.body.user.roles);
+
+    const hasPermission = permissions.some(permission => permission.slug === endpoint);
+    if (!hasPermission) {
+      return res.status(403).json({ message: 'You do not have permission to access this resource.' });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Failed to verify permissions.' });
+  }
 };

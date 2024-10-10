@@ -1,5 +1,7 @@
 import { Permission } from '../models/Permission';
+import { User } from '../models/User';
 import * as permissionRepository from '../repositories/permissionRepository';
+import { Role } from '../models/Role';
 
 export const getAllPermissions = async (withRoles?: boolean): Promise<Permission[]> => { 
   return permissionRepository.findAllUsers(withRoles);
@@ -30,4 +32,9 @@ export const getUserById = async (id: number) => {
     throw new Error('Permission not found');
   }
   return permission;
+};
+
+// Fetch permissions associated with the roles
+export const findPermissionsByRoles = async (roles: Role[]): Promise<Permission[]> => {
+  return await permissionRepository.findPermissionsByRoles(roles);
 };

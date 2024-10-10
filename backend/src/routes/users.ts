@@ -10,21 +10,21 @@ import {
         addRoleToUser
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
-import { verifyToken } from '../middleware/authMiddleware';
+import { verifyToken, verifyPermissions } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // base route: /api/users
 
 // Routes for Utility Requests
-router.get('/', verifyToken, getUsers);
-router.get('/:uuid/add/role/:slug', verifyToken, addRoleToUser);
+router.get('/', verifyToken, verifyPermissions, getUsers);  
+router.get('/:uuid/add/role/:slug', verifyToken, verifyPermissions, addRoleToUser);
 
 // Routes for CRUD operations on users
-router.post('/', verifyToken, createUser); // Create
-router.get('/:id', verifyToken, getUserById); // Read
-router.patch('/:id', verifyToken, updateUser); // Update
-router.delete('/:id', verifyToken, deleteUser); // Delete
+router.post('/', verifyToken, verifyPermissions, createUser); // Create
+router.get('/:id', verifyToken, verifyPermissions, getUserById); // Read
+router.patch('/:id', verifyToken, verifyPermissions, updateUser); // Update
+router.delete('/:id', verifyToken, verifyPermissions, deleteUser); // Delete
 
 // Route to handle Google Sign-In (sub and email)
 router.post('/signin', googleAuth, signin);
