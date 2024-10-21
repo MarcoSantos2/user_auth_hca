@@ -3,7 +3,7 @@ import { Role } from "../models/Role";
 import * as userService from './userService';
 import * as permissionService from './permissionService';
 import * as roleRepository from "../repositories/roleRepository";
-import { permission } from "process";
+
 
 export const createRole = async ({ name, description, slug }: { name: string; description: string; slug: string }): Promise<Partial<Role>> => {
   return await roleRepository.createRole({ name, description, slug });

@@ -11,6 +11,9 @@ import {
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken, verifyPermissions } from '../middleware/authMiddleware';
+import * as companyController from '../controllers/companyController';
+import * as userCompanyRoleController from '../controllers/userCompanyRoleController';
+
 
 const router = Router();
 
@@ -29,8 +32,16 @@ router.delete('/:id', verifyToken, verifyPermissions, deleteUser); // Delete
 // Route to handle Google Sign-In (sub and email)
 router.post('/signin', googleAuth, signin);
 router.post('/signup', googleAuth, signup);
+
 // Route to handle direct user signin and signup (email and password)
 router.post('/direct/signin', signin);
 router.post('/direct/signup', signup);
+
+// Company Routes
+router.post('/company', verifyToken, verifyPermissions, companyController.createCompany);
+
+// User Company Roles Route
+router.post('/company/assign', verifyToken, verifyPermissions, userCompanyRoleController.assignRoleToUserInCompany);
+
 
 export default router;

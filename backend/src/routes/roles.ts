@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { createRole, getRoles, getRole, updateRole, deleteRole, addUserToRole, addPermissionToRole, addPermissionsToRole } from '../controllers/roleController';
+import { createRole, 
+    getRoles, 
+    getRole, 
+    updateRole, 
+    deleteRole, 
+    addUserToRole, 
+    addPermissionToRole, 
+    addPermissionsToRole } from '../controllers/roleController';
 import { verifyToken, verifyPermissions } from '../middleware/authMiddleware';
 
 const router = Router();

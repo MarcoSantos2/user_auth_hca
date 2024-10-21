@@ -13,6 +13,7 @@ import {
 } from "typeorm";
 import { Role } from "./Role";
 import { GoogleAccount } from "./GoogleAccount";
+import { UserCompanyRole } from "./UserCompanyRole";
 
 @Entity()
 export class User {
@@ -43,6 +44,8 @@ export class User {
 
   @OneToMany(() => GoogleAccount, (google) => google.user)
   google_accounts!: GoogleAccount[]
+  @OneToMany(() => UserCompanyRole, userCompanyRole => userCompanyRole.user)
+  userCompanyRoles!: UserCompanyRole[];
 
   @CreateDateColumn()
   created_at!: Date;
@@ -58,7 +61,9 @@ export class User {
       uuid: this.uuid,
       name: this.name,
       email: this.email,
-      roles: this.roles
+      //roles: this.roles
+      userCompanyRoles: this.userCompanyRoles
+
     }
   }
 }
