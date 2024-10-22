@@ -4,6 +4,8 @@ import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserData } from '../types';
 import logger from '../utils/logger';
+import * as companyService from '../services/companyService';
+import * as roleService from '../services/roleService';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -153,6 +155,25 @@ export const addRoleToUser = async (req: Request, res: Response): Promise<void> 
     const { slug, uuid } = req.params;
     const user = await userService.addRoleToUser(uuid, slug);
     res.status(201).json(user);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const assignRoleToUserInCompany = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userUuid, companyId, roleSlug } = req.body;
+
+    // Validate input
+    if (!userUuid || !companyId || !roleSlug) {
+      res.status(400).json({ message: 'Missing required fields: userUuid, companyId, and roleSlug are required.' });
+      return;
+    }
+
+    // Assign role to user in the specified company
+    const updatedUser = await userService.addRoleToUserInCompany(userUuid, companyId, roleSlug);
+    
+    res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }

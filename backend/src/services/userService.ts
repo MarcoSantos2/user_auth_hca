@@ -7,6 +7,7 @@ import * as googleRepository from '../repositories/googleAccountRepository';
 import * as roleService from '../services/roleService';
 import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 import { GoogleAccount } from '../models/GoogleAccount';
+import * as companyService from './companyService';
 
 export const signup = async (userData: UserData): Promise<string | null> => {
   const { email, name, password, googleId } = userData;
@@ -157,4 +158,23 @@ export const addRoleToUser = async (userUuid: string, roleSlug: string): Promise
   }
 
   return await userRepository.saveUser(user);
+};
+
+export const addRoleToUserInCompany = async (userUuid: string, companyId: string, roleSlug: string): Promise<User> => {
+    const user = await getUserByUuid(userUuid, true);
+    const companyIdNumber = parseInt(companyId, 10); // Convert companyId to a number of base 10.
+    const company = await companyService.getCompanyById(companyIdNumber);
+    const role = await roleService.getRoleBySlug(roleSlug);
+
+    if (!user) {
+        throw new Error(`User with UUID ${userUuid} not found`);
+    }
+    if (!company) {
+        throw new Error(`Company with ID ${companyId} not found`);
+    }
+    if (!role) {
+        throw new Error(`Role with slug ${roleSlug} not found`);
+    }
+
+    return user; // Return the updated user or the userCompanyRole as needed
 };

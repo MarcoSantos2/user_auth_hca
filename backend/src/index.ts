@@ -6,8 +6,7 @@ import userRoutes from './routes/users';
 import roleRoutes from './routes/roles';
 import { AppDataSource } from "./datasource";
 import { getAllPermissions } from './services/permissionService'; 
-import companyRoutes from './routes/users';
-import userCompanyRoleRoutes from './routes/users';
+import companyRoutes from './routes/company';
 
 
 dotenv.config();
@@ -29,7 +28,6 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/companies', companyRoutes);
-app.use('/api/user-company-roles', userCompanyRoleRoutes);
 
 // Serve the Google Sign-In HTML file dynamically
 app.get('/', (req: Request, res: Response) => {

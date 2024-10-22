@@ -49,6 +49,7 @@ export const addUserToRole = async (userUuid: string, roleSlug: string): Promise
   return await roleRepository.saveRole(role);
 };
 
+// Add one permission to the role
 export const addPermissionToRole = async (permission_slug: string, roleSlug: string): Promise<Role> => {
   const permission = await permissionService.getPermissionBySlug(permission_slug);
   const role = await getRoleBySlug(roleSlug, false, true);
@@ -66,6 +67,7 @@ export const addPermissionToRole = async (permission_slug: string, roleSlug: str
   return await roleRepository.saveRole(role);
 };
 
+// Add multiple permissions to the role
 export const addPermissionsToRole = async (permission_list: string[], roleSlug: string): Promise<Role> => {
   const permissions = await permissionService.getPermissionsBySlugList(permission_list);
   const role = await getRoleBySlug(roleSlug, false, true);
