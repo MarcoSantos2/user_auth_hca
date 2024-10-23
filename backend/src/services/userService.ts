@@ -8,6 +8,8 @@ import * as roleService from '../services/roleService';
 import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 import { GoogleAccount } from '../models/GoogleAccount';
 import * as companyService from './companyService';
+import { Company } from '../models/Company';
+import { AppDataSource } from '../datasource';
 
 export const signup = async (userData: UserData): Promise<string | null> => {
   const { email, name, password, googleId } = userData;
@@ -176,5 +178,19 @@ export const addRoleToUserInCompany = async (userUuid: string, companyId: string
         throw new Error(`Role with slug ${roleSlug} not found`);
     }
 
-    return user; // Return the updated user or the userCompanyRole as needed
+    return user; // Return the updated user
+};
+
+export const getUserCompanies = async (userUuid: string): Promise<Company[]> => {
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+        where: { uuid: userUuid },
+        relations: ['companies'], // Ensure to load the companies relation
+    });
+
+    if (!user) {
+        throw new Error(`User with UUID ${userUuid} not found`);
+    }
+
+    return user.companies;
 };

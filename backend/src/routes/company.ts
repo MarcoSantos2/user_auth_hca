@@ -9,8 +9,11 @@ const router = Router();
 // Route to create a new company
 router.post('/', verifyToken, verifyPermissions, companyController.createCompany);
 
-// Route to get a company by ID
+// Route to get ONE company by ID
 router.get('/:id', verifyToken, verifyPermissions, companyController.getCompanyById);
+
+// Route to get all companies
+router.get('/', verifyToken, verifyPermissions, companyController.getAllCompanies);
 
 // Route to update a company (you can implement the updateCompany function in the controller)
 router.patch('/:id', verifyToken, verifyPermissions, companyController.updateCompany);

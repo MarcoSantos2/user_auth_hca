@@ -4,8 +4,7 @@ import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserData } from '../types';
 import logger from '../utils/logger';
-import * as companyService from '../services/companyService';
-import * as roleService from '../services/roleService';
+
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -177,4 +176,15 @@ export const assignRoleToUserInCompany = async (req: Request, res: Response): Pr
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
+};
+
+export const getUserCompanies = async (req: Request, res: Response): Promise<void> => {
+    const userUuid = req.params.id; // Assuming the user ID is passed as a URL parameter
+
+    try {
+        const companies = await userService.getUserCompanies(userUuid);
+        res.status(200).json(companies);
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
+    }
 };

@@ -19,3 +19,7 @@ export const save = async (company: Company): Promise<Company> => {
 export const deleteCompany = async (id: number): Promise<void> => {
   await companyRepository.delete(id);
 };
+
+export const findAllCompanies = async (): Promise<Company[]> => {
+    return await companyRepository.find();
+};

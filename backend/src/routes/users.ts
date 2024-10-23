@@ -7,7 +7,8 @@ import {
         updateUser, 
         deleteUser, 
         getUserById,
-        addRoleToUser
+        addRoleToUser,
+        getUserCompanies
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken, verifyPermissions } from '../middleware/authMiddleware';
@@ -34,5 +35,8 @@ router.post('/signup', googleAuth, signup);
 // Route to handle direct user signin and signup (email and password)
 router.post('/direct/signin', signin);
 router.post('/direct/signup', signup);
+
+// Route to get all companies for a user
+router.get('/:id/companies', verifyToken, getUserCompanies);
 
 export default router;
