@@ -15,7 +15,8 @@
     "migrations": "npm run create:db && npx typeorm-ts-node-commonjs migration:run -d ./src/datasource.ts",
     "migrations:revert": "npx typeorm-ts-node-commonjs migration:revert -d ./src/datasource.ts",
     "migrations:create": "cd ./src/migrations && npx typeorm migration:create",
-    "smile": "ts-node src/scripts/smile.ts"
+    "smile": "ts-node src/scripts/smile.ts",
+    "generateRoleSlug": "ts-node src/scripts/generateRoleSlug.ts"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
   "homepage": "https://github.com/cxfos/health_care_aide_app#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",

@@ -162,25 +162,6 @@ export const addRoleToUser = async (userUuid: string, roleSlug: string): Promise
   return await userRepository.saveUser(user);
 };
 
-export const addRoleToUserInCompany = async (userUuid: string, companyId: string, roleSlug: string): Promise<User> => {
-    const user = await getUserByUuid(userUuid, true);
-    const companyIdNumber = parseInt(companyId, 10); // Convert companyId to a number of base 10.
-    const company = await companyService.getCompanyById(companyIdNumber);
-    const role = await roleService.getRoleBySlug(roleSlug);
-
-    if (!user) {
-        throw new Error(`User with UUID ${userUuid} not found`);
-    }
-    if (!company) {
-        throw new Error(`Company with ID ${companyId} not found`);
-    }
-    if (!role) {
-        throw new Error(`Role with slug ${roleSlug} not found`);
-    }
-
-    return user; // Return the updated user
-};
-
 export const getUserCompanies = async (userUuid: string): Promise<Company[]> => {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({

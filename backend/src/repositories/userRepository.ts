@@ -30,13 +30,16 @@ export const findUserById = async (id: number): Promise<User | null> => {
   return await userRepository.findOneBy({id});
 };
 
-export const findUserByUuid = async (uuid: string, withRoles: boolean = false): Promise<User | null> => {
+export const findUserByUuid = async (uuid: string, withRoles: boolean = false, withCompanies: boolean = false): Promise<User | null> => {
   const query = userRepository
     .createQueryBuilder('user')
     .where("user.uuid = :uuid", { uuid: uuid });
 
   if (withRoles) {
     query.leftJoinAndSelect("user.roles", "role");
+  }
+  if (withCompanies) {
+    query.leftJoinAndSelect("user.companies", "company");
   }
 
   return await query.getOne();

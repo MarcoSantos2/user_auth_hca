@@ -1,9 +1,14 @@
 import { 
   Entity, 
   PrimaryGeneratedColumn, 
-  Column, 
-  ManyToOne, 
-  ManyToMany 
+  Column,
+  ManyToMany,
+  Index,
+  Generated,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn
 } from "typeorm";
 import { User } from "./User";
 import { Role } from "./Role";
@@ -19,15 +24,23 @@ export class Company {
   @Column({ type: 'text', nullable: true })
   description!: string;
 
-  @Column({ type: 'varchar', length: 36 })
-  userUuid!: string;
-
-  @ManyToOne(() => User, user => user.companies, { nullable: false })
-  user!: User; 
+  @Column()
+  @Index({ unique: true })
+  @Generated("uuid")
+  uuid!: string;  // Public UUID for external use
 
   @ManyToMany(() => User, (user) => user.companies)
   users!: User[];
+  
+  @OneToMany(() => Role, (role) => role.company)
+  roles!: Role[];
 
-  @ManyToOne(() => Role, (role) => role.companies, { nullable: false })
-  role!: Role;
+  @CreateDateColumn()
+  created_at!: Date;
+
+  @UpdateDateColumn()
+  updated_at!: Date;
+
+  @DeleteDateColumn()
+  deleted_at!: Date | null;
 }

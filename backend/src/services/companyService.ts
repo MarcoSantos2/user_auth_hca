@@ -2,7 +2,6 @@
 
 import * as companyRepository from '../repositories/companyRepository';
 import * as roleService from '../services/roleService';
-import * as permissionService from '../services/permissionService';
 import { Company } from '../models/Company';
 import { User } from '../models/User';
 
@@ -10,31 +9,33 @@ export const createCompany = async (companyData: { name: string; description?: s
     // Create the company
     const company = await companyRepository.createCompany(companyData);
 
-    // Create the "Master" role
-    const masterRole = await roleService.createRole({
-        name: "Master",
-        description: "Master role for company management",
-        slug: "master"
+    // Create the "Admin" role
+    const adminSlug = `admin_${company.id * 42}`; //use ID instead of UUID so this will be a readable number
+    // Why 42, do you ask? Because it is the answer to the ultimate question of life, the Universe, and everything.
+    // Still confused? I recommend you read The Hitchhiker's Guide to Galaxy. 
+
+    const adminRole = await roleService.createRole({
+        name: "Admin",
+        description: "Admin role for company management",
+        slug: adminSlug,
+        company
     });
 
-    // Fetch all permissions
-    const allPermissions = await permissionService.getAllPermissions();
+    // TODO: Create the other default roles for the companies (eg HR, HCA etc)
 
     // Add all permissions to the "Master" role
-    for (const permission of allPermissions) {
-        await roleService.addPermissionToRole(permission.slug, masterRole.slug!);
-    }
-
+    await roleService.addAllPermissionsToRole(adminRole?.slug || "");
+       
     // Assign the "Master" role to the user
-    await roleService.addUserToRole(user.uuid, masterRole.slug!);
+    await roleService.addUserToRole(user.uuid, adminRole.slug || "");
 
     return company;
 };
 
-export const getCompanyById = async (id: number): Promise<Company | null> => {
-    const company = await companyRepository.findCompanyById(id);
+export const getCompanyByUuid = async (uuid: string): Promise<Company | null> => {
+    const company = await companyRepository.findCompanyByUuid(uuid);
     if (!company) {
-        throw new Error(`Company with ID ${id} not found`);
+        throw new Error(`Company with UUID ${uuid} not found`);
     }
     return company;
 };
@@ -47,20 +48,20 @@ export const getAllCompanies = async (): Promise<Company[] | string> => {
   return companies;
 };
 
-export const updateCompany = async (id: number, updates: { name?: string; description?: string }): Promise<Company> => {
-  const company = await companyRepository.findCompanyById(id);
+export const updateCompany = async (uuid: string, updates: { name?: string; description?: string }): Promise<Company> => {
+  const company = await companyRepository.findCompanyByUuid(uuid);
   if (!company) {
-      throw new Error(`Company with ID ${id} not found`);
+      throw new Error(`Company with UUID ${uuid} not found`);
   }
   Object.assign(company, updates);
   return await companyRepository.save(company);
 };
 
-export const deleteCompany = async (id: number): Promise<void> => {
-  const company = await companyRepository.findCompanyById(id);
+export const deleteCompany = async (uuid: string): Promise<void> => {
+  const company = await companyRepository.findCompanyByUuid(uuid);
   if (!company) {
-      throw new Error(`Company with ID ${id} not found`);
+      throw new Error(`Company with UUID ${uuid} not found`);
   }
-  await companyRepository.deleteCompany(id);
+  await companyRepository.deleteCompany(uuid);
 };
 

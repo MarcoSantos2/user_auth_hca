@@ -24,10 +24,10 @@ export const createCompany = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const getCompanyById = async (req: Request, res: Response): Promise<void> => {
+export const getCompanyByUuid = async (req: Request, res: Response): Promise<void> => {
   try {
-      const companyId = parseInt(req.params.id);
-      const company = await companyService.getCompanyById(companyId);
+      const companyUuid = req.params.uuid;
+      const company = await companyService.getCompanyByUuid(companyUuid);
       res.status(200).json(company);
   } catch (error) {
       res.status(500).json({ message: (error as Error).message });
@@ -35,11 +35,11 @@ export const getCompanyById = async (req: Request, res: Response): Promise<void>
 };
 
 export const updateCompany = async (req: Request, res: Response): Promise<void> => {
-  const companyId = parseInt(req.params.id);
+  const companyUuid = req.params.uuid;
   const { name, description } = req.body;
 
   try {
-      const updatedCompany = await companyService.updateCompany(companyId, { name, description });
+      const updatedCompany = await companyService.updateCompany(companyUuid, { name, description });
       res.status(200).json(updatedCompany);
   } catch (error) {
       res.status(500).json({ message: (error as Error).message });
@@ -47,10 +47,10 @@ export const updateCompany = async (req: Request, res: Response): Promise<void> 
 };
 
 export const deleteCompany = async (req: Request, res: Response): Promise<void> => {
-  const companyId = parseInt(req.params.id);
+  const companyUuid = req.params.uuid;
 
   try {
-      await companyService.deleteCompany(companyId);
+      await companyService.deleteCompany(companyUuid);
       res.status(200).json({ message: 'Company deleted successfully' });
   } catch (error) {
       res.status(500).json({ message: (error as Error).message });

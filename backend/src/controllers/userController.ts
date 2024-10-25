@@ -159,25 +159,6 @@ export const addRoleToUser = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const assignRoleToUserInCompany = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { userUuid, companyId, roleSlug } = req.body;
-
-    // Validate input
-    if (!userUuid || !companyId || !roleSlug) {
-      res.status(400).json({ message: 'Missing required fields: userUuid, companyId, and roleSlug are required.' });
-      return;
-    }
-
-    // Assign role to user in the specified company
-    const updatedUser = await userService.addRoleToUserInCompany(userUuid, companyId, roleSlug);
-    
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-};
-
 export const getUserCompanies = async (req: Request, res: Response): Promise<void> => {
     const userUuid = req.params.id; // Assuming the user ID is passed as a URL parameter
 

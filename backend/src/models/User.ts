@@ -13,7 +13,7 @@ import {
 } from "typeorm";
 import { Role } from "./Role";
 import { GoogleAccount } from "./GoogleAccount";
-import { Company } from "./Company"; // Import Company
+import { Company } from "./Company";
 
 @Entity()
 export class User {

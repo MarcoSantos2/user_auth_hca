@@ -14,6 +14,10 @@ export interface UserData {
   picture?: string;
 }
 
+export type CreateRole = Pick<Role, "name" | "description" | "slug" | "company">;
+
+export type UpdateRole = Pick<Role, "name" | "description" | "slug">;
+
 interface DirectLoginPayload {
   email: string;
   password: string;

@@ -3,12 +3,13 @@ import {
   PrimaryGeneratedColumn, 
   Column,
   JoinTable,
-  ManyToMany, 
-  OneToMany, 
+  ManyToMany,  
   CreateDateColumn, 
   UpdateDateColumn, 
   DeleteDateColumn, 
-  Index
+  Index,
+  ManyToOne,
+  JoinColumn
 } from "typeorm";
 import { User } from "./User";
 import { Permission } from "./Permission";
@@ -36,8 +37,9 @@ export class Role {
   @JoinTable()
   permissions!: Permission[];
 
-  @OneToMany(() => Company, (company) => company.role)
-  companies!: Company[];
+  @ManyToOne(() => Company, (company) => company.roles)
+  @JoinColumn({ name: 'company_id' })
+  company!: Company;
 
   @CreateDateColumn()
   created_at!: Date;

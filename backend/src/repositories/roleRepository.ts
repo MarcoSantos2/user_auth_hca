@@ -30,7 +30,7 @@ export const deleteRole = async (slug: string): Promise<void> => {
   await roleRepository.softDelete({ slug });
 };
 
-export const findRoleBySlug = async (slug: string, withUsers = false, withPermissions = false): Promise<Role | null> => {
+export const findRoleBySlug = async (slug: string, withUsers: boolean = false, withPermissions: boolean = false, withCompany: boolean = false): Promise<Role | null> => {
   const query = roleRepository
     .createQueryBuilder('role')
     .where("role.slug = :slug", { slug: slug });
@@ -41,6 +41,9 @@ export const findRoleBySlug = async (slug: string, withUsers = false, withPermis
 
   if (withPermissions) {
     query.leftJoinAndSelect("role.permissions", "permission");
+  }
+  if (withCompany) {
+    query.leftJoinAndSelect("role.company", "company");
   }
 
   return await query.getOne();

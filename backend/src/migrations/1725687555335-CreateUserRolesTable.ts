@@ -28,6 +28,6 @@ export class CreateUserRolesTable1725000000001 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE user_roles`);
+        await queryRunner.query(`DROP TABLE user_roles_role`);
     }
 }
