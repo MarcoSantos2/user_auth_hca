@@ -8,13 +8,17 @@ export const createCompany = async (company: Partial<Company>): Promise<Company>
   return await companyRepository.save(newCompany);
 };
 
-export const findCompanyByUuid = async (uuid: string, withUsers: boolean = false): Promise<Company | null> => {
+export const findCompanyByUuid = async (uuid: string, withUsers: boolean = false, withRoles: boolean = false): Promise<Company | null> => {
   const query = companyRepository
     .createQueryBuilder('company')
     .where("company.uuid = :uuid", { uuid: uuid });
 
   if (withUsers) {
     query.leftJoinAndSelect("company.users", "user");
+  }
+
+  if (withRoles) {
+    query.leftJoinAndSelect("company.roles", "role");
   }
 
   return await query.getOne();

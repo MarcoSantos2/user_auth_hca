@@ -1,12 +1,18 @@
 // Management of the API interface to the business logic
 import { Request, Response } from 'express';
+import * as companyService from '../services/companyService';
 import * as roleService from '../services/roleService';
 import logger from '../utils/logger';
 
 export const createRole = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, description, slug } = req.body;
-    const role = await roleService.createRole({ name, description, slug });
+    const { name, description, slug, companyUuid } = req.body;
+    const company = await companyService.getCompanyByUuid(companyUuid);
+    if (!company) {
+      res.status(404).json({ message: 'Company not found' });
+      return;
+    }
+    const role = await roleService.createRole({ name, description, slug, company });
     logger.info(`Role created: ${name}`);
     res.status(201).json(role);
   } catch (error) {
@@ -21,15 +27,6 @@ export const updateRole = async (req: Request, res: Response): Promise<void> => 
     const { name, description, slug: newSlug } = req.body;
     const role = await roleService.updateRole(slug, { name, description, slug: newSlug });
     res.status(201).json(role);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-};
-
-export const getRoles = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const roles = await roleService.getAllRoles();
-    res.status(200).json({roles});
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
@@ -81,6 +78,16 @@ export const addPermissionsToRole = async (req: Request, res: Response): Promise
     const { permissions } = req.body;
     const role = await roleService.addPermissionsToRole(permissions, slug);
     res.status(201).json(role);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+// get Roles from ALL COMPANIES - Internal use only
+export const getRoles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const roles = await roleService.getAllRoles();
+    res.status(200).json({roles});
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }

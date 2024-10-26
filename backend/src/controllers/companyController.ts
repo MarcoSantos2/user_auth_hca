@@ -5,6 +5,8 @@ export const createCompany = async (req: Request, res: Response): Promise<void> 
   const { name, description } = req.body;
   const user = req.body.user;
 
+  // TODO - Find a VALIDATOR function or library to validate request body
+
   // Validate name and description
   if (typeof name !== 'string' || name.trim() === '') {
     res.status(400).json({ message: 'Invalid name: must be a non-empty string.' });
@@ -26,6 +28,12 @@ export const createCompany = async (req: Request, res: Response): Promise<void> 
 
 export const getCompanyByUuid = async (req: Request, res: Response): Promise<void> => {
   try {
+      const isUserInCompany = await companyService.isUserInCompany(req.params.uuid, req.body.user);
+      if(!isUserInCompany) {
+        res.status(403).json({ message: 'User is not in company' });
+        return;
+      }
+
       const companyUuid = req.params.uuid;
       const company = await companyService.getCompanyByUuid(companyUuid);
       res.status(200).json(company);
@@ -35,28 +43,40 @@ export const getCompanyByUuid = async (req: Request, res: Response): Promise<voi
 };
 
 export const updateCompany = async (req: Request, res: Response): Promise<void> => {
-  const companyUuid = req.params.uuid;
-  const { name, description } = req.body;
-
   try {
-      const updatedCompany = await companyService.updateCompany(companyUuid, { name, description });
-      res.status(200).json(updatedCompany);
+    const isUserInCompany = await companyService.isUserInCompany(req.params.uuid, req.body.user);
+    if(!isUserInCompany) {
+      res.status(403).json({ message: 'User is not in company' });
+      return;
+    }
+
+    const companyUuid = req.params.uuid;
+    const { name, description } = req.body;
+
+    const updatedCompany = await companyService.updateCompany(companyUuid, { name, description });
+    res.status(200).json(updatedCompany);
   } catch (error) {
       res.status(500).json({ message: (error as Error).message });
   }
 };
 
 export const deleteCompany = async (req: Request, res: Response): Promise<void> => {
-  const companyUuid = req.params.uuid;
-
   try {
-      await companyService.deleteCompany(companyUuid);
-      res.status(200).json({ message: 'Company deleted successfully' });
+    const isUserInCompany = await companyService.isUserInCompany(req.params.uuid, req.body.user);
+    if(!isUserInCompany) {
+      res.status(403).json({ message: 'User is not in company' });
+      return;
+    }
+
+    const companyUuid = req.params.uuid;
+    await companyService.deleteCompany(companyUuid);
+    res.status(200).json({ message: 'Company deleted successfully' });
   } catch (error) {
       res.status(500).json({ message: (error as Error).message });
   }
 };
 
+// get ALL COMPANIES - Internal use only
 export const getAllCompanies = async (req: Request, res: Response): Promise<void> => {
     try {
         const companies = await companyService.getAllCompanies();

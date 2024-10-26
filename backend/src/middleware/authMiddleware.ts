@@ -19,7 +19,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({ message: 'Invalid or expired token' });
     }
     try {
-      const user = await getUserByUuid((decoded as UserJwtPayload).uuid, true);
+      const user = await getUserByUuid((decoded as UserJwtPayload).uuid, true, true);
       req.body.user = user;
       next();
     } catch (error) {
@@ -39,6 +39,7 @@ export const verifyPermissions = async (req: Request, res: Response, next: NextF
     const endpoint = `${method}:${fullPath}`; // Adjust this if you are using slugs differently
    
     // Check if the user has permission for this endpoint
+    // TODO - Verify if the request is for a specific company and evaluate only the roles for that company
     const permissions = await permissionService.findPermissionsByRoles(req.body.user.roles);
 
     const hasPermission = permissions.some(permission => permission.slug === endpoint);

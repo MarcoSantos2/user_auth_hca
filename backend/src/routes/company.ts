@@ -7,19 +7,20 @@ const router = Router();
 // Base route: /api/companies
 
 // Route to create a new company
-router.post('/', verifyToken, verifyPermissions, companyController.createCompany);
+router.post('/', verifyToken, companyController.createCompany);
 
-// Route to get ONE company by ID
-router.get('/:id', verifyToken, verifyPermissions, companyController.getCompanyById);
-
-// Route to get all companies
-router.get('/', verifyToken, verifyPermissions, companyController.getAllCompanies);
+// Route to get ONE company by UUID
+router.get('/:uuid', verifyToken, verifyPermissions, companyController.getCompanyByUuid);
 
 // Route to update a company (you can implement the updateCompany function in the controller)
-router.patch('/:id', verifyToken, verifyPermissions, companyController.updateCompany);
+router.patch('/:uuid', verifyToken, verifyPermissions, companyController.updateCompany);
 
 // Route to delete a company (you can implement the deleteCompany function in the controller)
-router.delete('/:id', verifyToken, verifyPermissions, companyController.deleteCompany);
+router.delete('/:uuid', verifyToken, verifyPermissions, companyController.deleteCompany);
+
+// Route to get ALL COMPANIES - Internal use only
+// TODO - Change Middleware that verify permissions to one specific from INTERNAL USE Validation
+router.get('/', verifyToken, verifyPermissions, companyController.getAllCompanies);
 
 export default router;
 

@@ -13,7 +13,6 @@ import {
 import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken, verifyPermissions } from '../middleware/authMiddleware';
 
-
 const router = Router();
 
 // base route: /api/users

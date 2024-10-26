@@ -60,16 +60,6 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
-export const getUsers = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const users = await userService.getAllUsers(true);
-    res.status(200).json(users);  // Send users' UUID, name, and email as a JSON response
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-};
-
 // Handles creating a user
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -168,4 +158,14 @@ export const getUserCompanies = async (req: Request, res: Response): Promise<voi
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
     }
+};
+
+// get Users from ALL COMPANIES - Internal use only
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const users = await userService.getAllUsers(true);
+    res.status(200).json(users);  // Send users' UUID, name, and email as a JSON response
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
 };

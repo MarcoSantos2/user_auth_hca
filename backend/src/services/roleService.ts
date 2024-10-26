@@ -20,6 +20,7 @@ export const updateRole = async (slug: string, { name, description, slug: newslu
   return await roleRepository.saveRole(role);
 };
 
+// This get Roles from ALL COMPANIES - Internal use only
 export const getAllRoles = async (): Promise<Role[]> => {
   return await roleRepository.findAllRoles();
 };
@@ -28,18 +29,23 @@ export const deleteRole = async (slug: string): Promise<void> => {
   await roleRepository.deleteRole(slug);
 };
 
-export const getRoleBySlug = async (slug: string, withUsers?: boolean, withPermissions?: boolean ): Promise<Role | null> => {
-  return await roleRepository.findRoleBySlug(slug, withUsers, withPermissions);
+export const getRoleBySlug = async (slug: string, withUsers?: boolean, withPermissions?: boolean, withCompany?: boolean  ): Promise<Role | null> => {
+  return await roleRepository.findRoleBySlug(slug, withUsers, withPermissions, withCompany);
 };
 
 export const addUserToRole = async (userUuid: string, roleSlug: string): Promise<Role> => {
-  const user = await userService.getUserByUuid(userUuid);
-  const role = await getRoleBySlug(roleSlug, true);
+  const user = await userService.getUserByUuid(userUuid, false, true);
   if (!user) {
     throw new Error(`User with Uuid ${userUuid} not found`);
   }
+  const role = await getRoleBySlug(roleSlug, true, false, true);
   if (!role) {
     throw new Error(`Role with Slug ${roleSlug} not found`);
+  }
+  
+  const hasCompany = user.companies.some(c => c.id === role.company.id);
+  if (!hasCompany) {
+    throw new Error(`User ${userUuid} does not belong to company ${role.company.id}`);
   }
 
   if (!role.users.some(u => u.id === user.id)) {
@@ -98,5 +104,4 @@ export const addAllPermissionsToRole = async (roleSlug: string): Promise<Role> =
   }
 
   return await roleRepository.saveRole(role);
-
 }

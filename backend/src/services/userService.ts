@@ -94,7 +94,7 @@ export const signIn = async (payload: DirectLoginPayload | ExternalLoginPayload)
   }
 };
 
-//async added in case we need to add more logic that includes async operations in the future
+// Get All Users of All Companies - Internal use only
 export const getAllUsers = async (withRoles?: boolean): Promise<User[]> => { 
   return userRepository.findAllUsers(withRoles);
 };
@@ -118,16 +118,14 @@ export const updateUser = async (uuid: string, updates: Partial<User>) => {
   return await userRepository.saveUser(user);
 };
 
-// Find User By UUID
-export const getUserByUuid = async (uuid: string, withRoles?: boolean) => {
-  const user = await userRepository.findUserByUuid(uuid, withRoles);
+export const getUserByUuid = async (uuid: string, withRoles?: boolean, withCompanies?: boolean) => {
+  const user = await userRepository.findUserByUuid(uuid, withRoles, withCompanies);
   if (!user) {
     throw new Error('User not found');
   }
   return user;
 };
 
-// Find User By ID
 export const getUserById = async (id: number) => {
   const user = await userRepository.findUserById(id);
   if (!user) {
@@ -136,7 +134,7 @@ export const getUserById = async (id: number) => {
   return user;
 };
 
-// This function will delete the user from the DB
+// This function will SOFT DELETE the user from the DB
 export const deleteUser = async (uuid: string): Promise<void> => {
   const user = await userRepository.findUserByUuid(uuid);
   if (!user) {
@@ -146,32 +144,11 @@ export const deleteUser = async (uuid: string): Promise<void> => {
 };
 
 export const addRoleToUser = async (userUuid: string, roleSlug: string): Promise<User> => {
-  const user = await getUserByUuid(userUuid, true);
-  const role = await roleService.getRoleBySlug(roleSlug);
-  if (!user) {
-    throw new Error(`User with Uuid ${userUuid} not found`);
-  }
-  if (!role) {
-    throw new Error(`Role with Slug ${roleSlug} not found`);
-  }
-
-  if (!user.roles.some(r => r.id === role.id)) {
-    user.roles.push(role);
-  }
-
-  return await userRepository.saveUser(user);
+  await roleService.addUserToRole(userUuid, roleSlug);
+  return await getUserByUuid(userUuid, true);
 };
 
 export const getUserCompanies = async (userUuid: string): Promise<Company[]> => {
-    const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({
-        where: { uuid: userUuid },
-        relations: ['companies'], // Ensure to load the companies relation
-    });
-
-    if (!user) {
-        throw new Error(`User with UUID ${userUuid} not found`);
-    }
-
-    return user.companies;
+  const user = await getUserByUuid(userUuid, false, true);
+  return user.companies;
 };

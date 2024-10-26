@@ -43,4 +43,12 @@ export class Company {
 
   @DeleteDateColumn()
   deleted_at!: Date | null;
+
+  toJSON() {
+    return {
+      uuid: this.uuid,
+      name: this.name,
+      description: this.description,
+    }
+  }
 }
