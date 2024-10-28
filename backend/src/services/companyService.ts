@@ -5,7 +5,7 @@ import * as roleService from '../services/roleService';
 import { Company } from '../models/Company';
 import { User } from '../models/User';
 import { Role } from '../models/Role';
-import { findUserByEmail, findUserByUuid } from '../repositories/userRepository';
+import { findUserByUuid } from '../repositories/userRepository';
 
 export const createCompany = async (companyData: { name: string; description?: string }, user: User): Promise<Company> => {
     // Create the company
