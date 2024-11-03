@@ -38,3 +38,6 @@ Create a new branch for your feature or bugfix, and submit a pull request.
 
 ## License
 This project is licensed under the Apache License 2.0.
+
+# High Level Architecture Flowchart
+[View High-Level Architecture](./Docs/highlevelarchitecture.md)
