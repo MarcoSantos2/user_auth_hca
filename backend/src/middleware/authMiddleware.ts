@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import { UserJwtPayload } from '../types';
 import { getUserByUuid } from '../services/userService';
 import * as permissionService from '../services/permissionService';
+import { getCompanyByUuid } from '../services/companyService';
+import { Company } from '../models/Company';
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -31,7 +33,17 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 export const verifyPermissions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Build the endpoint string
-
+    const companyHeader = req.headers['x-company-context'];
+    if (companyHeader && typeof companyHeader === 'string')  {
+      req.body.company = await getCompanyByUuid(companyHeader);
+    } else {
+      return res.status(401).json({ message: 'Invalid company context' });
+    }
+    const userHasAccess = req.body.user.companies.find((company: Company) => company.id === req.body.company.id);
+    if (!userHasAccess) {
+      return res.status(401).json({ message: 'User does not have access to this company' });
+    }
+    // Build the endpoint string
     const method = req.method; // e.g., "GET", "POST"
     const baseUrl = req.baseUrl; //TBD baseUrl or originalUrl // e.g., "/api/roles"
     const routePath = req.route.path;
@@ -39,8 +51,7 @@ export const verifyPermissions = async (req: Request, res: Response, next: NextF
     const endpoint = `${method}:${fullPath}`; // Adjust this if you are using slugs differently
    
     // Check if the user has permission for this endpoint
-    // TODO - Verify if the request is for a specific company and evaluate only the roles for that company
-    const permissions = await permissionService.findPermissionsByRoles(req.body.user.roles);
+    const permissions = await permissionService.findPermissionsByRolesAndCompany(req.body.user.roles, req.body.company);
 
     const hasPermission = permissions.some(permission => permission.slug === endpoint);
     if (!hasPermission) {

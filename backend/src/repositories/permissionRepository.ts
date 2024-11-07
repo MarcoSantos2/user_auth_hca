@@ -1,7 +1,7 @@
 import { AppDataSource } from "../datasource";
 import { Permission } from "../models/Permission";
 import { Role } from "../models/Role";
-
+import { Company } from "../models/Company";
 
 const permissionRepository = AppDataSource.getRepository(Permission);
 
@@ -44,7 +44,7 @@ export const findPermissionsBySlugList = async (slugs: string[], withRoles: bool
   return await query.getMany();
 };
 
-export const findPermissionsByRoles = async (roles: Role[]): Promise<Permission[]> => {
+export const findPermissionsByRolesAndCompany = async (roles: Role[], company: Company): Promise<Permission[]> => {
   if (!roles || roles.length === 0) {
     return [];
   }
@@ -55,5 +55,6 @@ export const findPermissionsByRoles = async (roles: Role[]): Promise<Permission[
     .createQueryBuilder('permission')
     .innerJoin('permission.roles', 'role') // Assuming there's a many-to-many relationship
     .where('role.id IN (:...roleIds)', { roleIds })
+    .where('role.company_id = (:companyId)', { companyId: company.id })
     .getMany();
 };

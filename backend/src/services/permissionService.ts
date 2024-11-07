@@ -2,6 +2,7 @@ import { Permission } from '../models/Permission';
 import { User } from '../models/User';
 import * as permissionRepository from '../repositories/permissionRepository';
 import { Role } from '../models/Role';
+import { Company } from '../models/Company';
 
 export const getAllPermissions = async (withRoles?: boolean): Promise<Permission[]> => { 
   return permissionRepository.findAllUsers(withRoles);
@@ -35,6 +36,6 @@ export const getUserById = async (id: number) => {
 };
 
 // Fetch permissions associated with the roles
-export const findPermissionsByRoles = async (roles: Role[]): Promise<Permission[]> => {
-  return await permissionRepository.findPermissionsByRoles(roles);
+export const findPermissionsByRolesAndCompany = async (roles: Role[], company: Company): Promise<Permission[]> => {
+  return await permissionRepository.findPermissionsByRolesAndCompany(roles, company);
 };

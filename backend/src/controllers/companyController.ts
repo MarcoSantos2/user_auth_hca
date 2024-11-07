@@ -28,13 +28,13 @@ export const createCompany = async (req: Request, res: Response): Promise<void> 
 
 export const getCompanyByUuid = async (req: Request, res: Response): Promise<void> => {
   try {
-      const isUserInCompany = await companyService.isUserInCompany(req.params.uuid, req.body.user);
+      const isUserInCompany = await companyService.isUserInCompany(req.body.company.uuid, req.body.user);
       if(!isUserInCompany) {
         res.status(403).json({ message: 'User is not in company' });
         return;
       }
 
-      const companyUuid = req.params.uuid;
+      const companyUuid = req.body.company.uuid;
       const company = await companyService.getCompanyByUuid(companyUuid);
       res.status(200).json(company);
   } catch (error) {
@@ -44,13 +44,13 @@ export const getCompanyByUuid = async (req: Request, res: Response): Promise<voi
 
 export const updateCompany = async (req: Request, res: Response): Promise<void> => {
   try {
-    const isUserInCompany = await companyService.isUserInCompany(req.params.uuid, req.body.user);
+    const isUserInCompany = await companyService.isUserInCompany(req.body.company.uuid, req.body.user);
     if(!isUserInCompany) {
       res.status(403).json({ message: 'User is not in company' });
       return;
     }
 
-    const companyUuid = req.params.uuid;
+    const companyUuid = req.body.company.uuid;
     const { name, description } = req.body;
 
     const updatedCompany = await companyService.updateCompany(companyUuid, { name, description });
@@ -62,13 +62,13 @@ export const updateCompany = async (req: Request, res: Response): Promise<void> 
 
 export const deleteCompany = async (req: Request, res: Response): Promise<void> => {
   try {
-    const isUserInCompany = await companyService.isUserInCompany(req.params.uuid, req.body.user);
+    const isUserInCompany = await companyService.isUserInCompany(req.body.company.uuid, req.body.user);
     if(!isUserInCompany) {
       res.status(403).json({ message: 'User is not in company' });
       return;
     }
 
-    const companyUuid = req.params.uuid;
+    const companyUuid = req.body.company.uuid;
     await companyService.deleteCompany(companyUuid);
     res.status(200).json({ message: 'Company deleted successfully' });
   } catch (error) {
