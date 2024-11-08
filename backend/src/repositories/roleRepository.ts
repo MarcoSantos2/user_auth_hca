@@ -48,3 +48,7 @@ export const findRoleBySlug = async (slug: string, withUsers: boolean = false, w
 
   return await query.getOne();
 };
+
+export const findRolesByCompanyId = async (companyId: number): Promise<Role[]> => {
+  return await roleRepository.find({ where: { company: { id: companyId } } });
+};

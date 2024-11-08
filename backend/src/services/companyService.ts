@@ -19,7 +19,7 @@ export const createCompany = async (companyData: { name: string; description?: s
     // Still confused? I recommend you read The Hitchhiker's Guide to Galaxy. 
 
     const adminRole = await roleService.createRole({
-        name: "Admin",
+        name: `${company.name} Admin`,
         description: "Admin role for company management",
         slug: adminSlug,
         company
@@ -67,6 +67,9 @@ export const deleteCompany = async (uuid: string): Promise<void> => {
   if (!company) {
       throw new Error(`Company with UUID ${uuid} not found`);
   }
+
+  await roleService.deleteRolesByCompanyId(company.id);
+
   await companyRepository.deleteCompany(uuid);
 };
 
