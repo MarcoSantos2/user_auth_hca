@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { 
-        getUsers, 
         signup, 
         signin, 
         createUser, 
@@ -17,9 +16,8 @@ const router = Router();
 
 // base route: /api/users
 
-// Routes for Utility Requests
-router.get('/', verifyToken, verifyPermissions, getUsers);  
-router.get('/:uuid/add/role/:slug', verifyToken, verifyPermissions, addRoleToUser);
+// Routes for Utility Requests  
+router.get('/:uuid/add/role/:slug', verifyToken, verifyPermissions, addRoleToUser);  // TODO delete comment - is this a get or a patch? Why is "add role" in the user route?
 
 // Routes for CRUD operations on users
 router.post('/', verifyToken, verifyPermissions, createUser); // Create

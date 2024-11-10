@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { createRole, 
-    getRoles, 
     getRole, 
     updateRole, 
     deleteRole, 
@@ -11,12 +10,11 @@ import { verifyToken, verifyPermissions } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// MARCO, LOOK AT THIS >>>>>>>> Base route: /api/roles
+// Base route: /api/roles
 
 // Routes for Utility Requests
-router.get('/', verifyToken, verifyPermissions, getRoles);
-router.get('/:slug/add/user/:uuid', verifyToken, verifyPermissions, addUserToRole);
-router.get('/:slug/add/permission/:permission_slug', verifyToken, verifyPermissions, addPermissionToRole);
+router.get('/:slug/add/user/:uuid', verifyToken, verifyPermissions, addUserToRole); // TODO - delete comment - should this be a PATCH?
+router.get('/:slug/add/permission/:permission_slug', verifyToken, verifyPermissions, addPermissionToRole); // TODO - delete comment - should this be a PATCH?
 router.post('/:slug/add/permissions', verifyToken, verifyPermissions, addPermissionsToRole);
 
 // Routes for CRUD operations on roles

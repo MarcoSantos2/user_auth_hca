@@ -5,6 +5,7 @@ import { getUserByUuid } from '../services/userService';
 import * as permissionService from '../services/permissionService';
 import { getCompanyByUuid } from '../services/companyService';
 import { Company } from '../models/Company';
+import { Role } from '../models/Role';
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -30,6 +31,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
   });
 };
 
+// External permissions (app users)
 export const verifyPermissions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Build the endpoint string
@@ -62,4 +64,16 @@ export const verifyPermissions = async (req: Request, res: Response, next: NextF
   } catch (error) {
     return res.status(401).json({ message: 'Failed to verify permissions.' });
   }
+};
+
+// Internal permissions (admin users)
+export const verifyAdmin = (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.body.user);
+  const hasAdminRole = req.body.user.roles.some((role: Role) => role.slug === 'InternalAdmin');
+  
+  if (req.body.user && hasAdminRole) {
+    return next();
+  }
+  
+  return res.status(403).json({ message: 'Access denied. Admins only.' });
 };
