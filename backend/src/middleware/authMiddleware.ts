@@ -68,7 +68,6 @@ export const verifyPermissions = async (req: Request, res: Response, next: NextF
 
 // Internal permissions (admin users)
 export const verifyAdmin = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body.user);
   const hasAdminRole = req.body.user.roles.some((role: Role) => role.slug === 'InternalAdmin');
   
   if (req.body.user && hasAdminRole) {

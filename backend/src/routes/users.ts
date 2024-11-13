@@ -7,23 +7,24 @@ import {
         deleteUser, 
         getUserById,
         addRoleToUser,
-        getUserCompanies
+        getUserCompanies,
+        getUsers
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
-import { verifyToken, verifyPermissions } from '../middleware/authMiddleware';
+import { verifyToken, verifyPermissions, verifyAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // base route: /api/users
 
 // Routes for Utility Requests  
-router.get('/:uuid/add/role/:slug', verifyToken, verifyPermissions, addRoleToUser);  // TODO delete comment - is this a get or a patch? Why is "add role" in the user route?
+router.get('/:uuid/add/role/:slug', verifyToken, verifyPermissions, addRoleToUser);
 
 // Routes for CRUD operations on users
-router.post('/', verifyToken, verifyPermissions, createUser); // Create
-router.get('/:id', verifyToken, verifyPermissions, getUserById); // Read
-router.patch('/:id', verifyToken, verifyPermissions, updateUser); // Update
-router.delete('/:id', verifyToken, verifyPermissions, deleteUser); // Delete
+router.post('/', verifyToken, verifyPermissions, createUser); 
+router.get('/:id', verifyToken, verifyPermissions, getUserById); 
+router.patch('/:id', verifyToken, verifyPermissions, updateUser); 
+router.delete('/:id', verifyToken, verifyPermissions, deleteUser); 
 
 // Route to handle Google Sign-In (sub and email)
 router.post('/signin', googleAuth, signin);
@@ -35,5 +36,8 @@ router.post('/direct/signup', signup);
 
 // Route to get all companies for a user
 router.get('/:id/companies', verifyToken, getUserCompanies);
+
+// Routes for Admin use only
+router.get('/', verifyToken, verifyAdmin, getUsers);
 
 export default router;

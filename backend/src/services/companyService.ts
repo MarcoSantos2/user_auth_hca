@@ -19,7 +19,7 @@ export const createCompany = async (companyData: { name: string; description?: s
     // Still confused? I recommend you read The Hitchhiker's Guide to Galaxy. 
 
     const adminRole = await roleService.createRole({
-        name: `${company.name} Admin`,
+        name: "Admin",
         description: "Admin role for company management",
         slug: adminSlug,
         company
