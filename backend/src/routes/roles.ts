@@ -19,10 +19,10 @@ router.get('/:slug/add/permission/:permission_slug', verifyToken, verifyPermissi
 router.post('/:slug/add/permissions', verifyToken, verifyPermissions, addPermissionsToRole);
 
 // Routes for CRUD operations on roles
-router.post('/', verifyToken, verifyPermissions, createRole); // Create
-router.get('/:slug', verifyToken, verifyPermissions, getRole); // Read
-router.patch('/:slug', verifyToken, verifyPermissions, updateRole); // Update
-router.delete('/:slug', verifyToken, verifyPermissions, deleteRole); // Delete
+router.post('/', verifyToken, verifyPermissions, createRole); 
+router.get('/:slug', verifyToken, verifyPermissions, getRole); 
+router.patch('/:slug', verifyToken, verifyPermissions, updateRole); 
+router.delete('/:slug', verifyToken, verifyPermissions, deleteRole); 
 
 // Routes for Admin use only
 router.get('/', verifyToken, verifyAdmin, getRoles);

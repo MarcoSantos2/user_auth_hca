@@ -12,6 +12,7 @@ import {
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken, verifyPermissions, verifyAdmin } from '../middleware/authMiddleware';
+import { submitFeedback } from '../controllers/feedbackController';
 
 const router = Router();
 
@@ -39,5 +40,7 @@ router.get('/:id/companies', verifyToken, getUserCompanies);
 
 // Routes for Admin use only
 router.get('/', verifyToken, verifyAdmin, getUsers);
+// Route to submit feedback
+router.post('/feedback', verifyToken, submitFeedback);
 
 export default router;

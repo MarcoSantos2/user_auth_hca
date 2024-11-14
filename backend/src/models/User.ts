@@ -14,6 +14,7 @@ import {
 import { Role } from "./Role";
 import { GoogleAccount } from "./GoogleAccount";
 import { Company } from "./Company";
+import { Feedback } from "./Feedback";
 
 @Entity()
 export class User {
@@ -48,6 +49,9 @@ export class User {
   @ManyToMany(() => Company, (company) => company.users)
   @JoinTable()
   companies!: Company[];
+
+  @OneToMany(() => Feedback, (feedback) => feedback.user)
+  feedbacks!: Feedback[];
 
   @CreateDateColumn()
   created_at!: Date;

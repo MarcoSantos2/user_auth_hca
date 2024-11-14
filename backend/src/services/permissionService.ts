@@ -1,5 +1,4 @@
 import { Permission } from '../models/Permission';
-import { User } from '../models/User';
 import * as permissionRepository from '../repositories/permissionRepository';
 import { Role } from '../models/Role';
 import { Company } from '../models/Company';

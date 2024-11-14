@@ -7,9 +7,7 @@ import * as googleRepository from '../repositories/googleAccountRepository';
 import * as roleService from '../services/roleService';
 import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 import { GoogleAccount } from '../models/GoogleAccount';
-import * as companyService from './companyService';
 import { Company } from '../models/Company';
-import { AppDataSource } from '../datasource';
 
 export const signup = async (userData: UserData): Promise<string | null> => {
   const { email, name, password, googleId } = userData;
