@@ -25,7 +25,7 @@ router.get('/:uuid/add/role/:slug', verifyToken, verifyPermissions, addRoleToUse
 router.post('/', verifyToken, verifyPermissions, createUser); 
 router.get('/:id', verifyToken, verifyPermissions, getUserById); 
 router.patch('/:id', verifyToken, verifyPermissions, updateUser); 
-router.delete('/:id', verifyToken, verifyPermissions, deleteUser); 
+router.delete('/:id', verifyToken, verifyPermissions, deleteUser);
 
 // Route to handle Google Sign-In (sub and email)
 router.post('/signin', googleAuth, signin);
@@ -42,5 +42,12 @@ router.get('/:id/companies', verifyToken, getUserCompanies);
 router.get('/', verifyToken, verifyAdmin, getUsers);
 // Route to submit feedback
 router.post('/feedback', verifyToken, submitFeedback);
+
+// Routes for Admin use only
+router.get('/', verifyToken, verifyAdmin, getUsers);
+
+// Route to submit feedback
+router.post('/feedback', verifyToken, submitFeedback);
+
 
 export default router;

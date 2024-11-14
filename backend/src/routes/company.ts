@@ -14,9 +14,8 @@ router.delete('/', verifyToken, verifyPermissions, companyController.deleteCompa
 
 // Routes for Admin use only
 router.get('/all', verifyToken, verifyAdmin, companyController.getAllCompanies);
-// Route to get ALL COMPANIES - Internal use only
+
 // TODO - Change Middleware that verify permissions to one specific for INTERNAL USE Validation
-// router.get('/all', verifyToken, verifyPermissions, companyController.getAllCompanies);
 
 export default router;
 
