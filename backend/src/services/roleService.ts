@@ -106,12 +106,3 @@ export const addAllPermissionsToRole = async (roleSlug: string): Promise<Role> =
   return await roleRepository.saveRole(role);
 }
 
-export const deleteRolesByCompanyId = async (companyId: number): Promise<void> => {
-  
-  const roles = await roleRepository.findRolesByCompanyId(companyId);
-  
-  for (const role of roles) {
-    await deleteRole(role.slug);
-  }
-};
-

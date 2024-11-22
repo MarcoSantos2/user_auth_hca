@@ -68,8 +68,6 @@ export const deleteCompany = async (uuid: string): Promise<void> => {
       throw new Error(`Company with UUID ${uuid} not found`);
   }
 
-  await roleService.deleteRolesByCompanyId(company.id);
-
   await companyRepository.deleteCompany(uuid);
 };
 
