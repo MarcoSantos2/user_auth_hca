@@ -32,7 +32,10 @@ export class Company {
   @ManyToMany(() => User, (user) => user.companies)
   users!: User[];
   
-  @OneToMany(() => Role, (role) => role.company)
+  @OneToMany(() => Role, (role) => role.company, {
+    cascade: true, 
+    orphanedRowAction: "soft-delete"
+  })
   roles!: Role[];
 
   @CreateDateColumn()

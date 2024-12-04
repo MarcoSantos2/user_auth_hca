@@ -29,7 +29,11 @@ export const save = async (company: Company): Promise<Company> => {
 };
 
 export const deleteCompany = async (uuid: string): Promise<void> => {
-  await companyRepository.softDelete({uuid});
+  const company = await companyRepository.findOne({ where: { uuid }, relations: ["roles"] }); // Finding the roles is crucial for cascading operations
+
+  if (company) {
+    await companyRepository.softRemove(company);
+  }
 };
 
 export const findAllCompanies = async (): Promise<Company[]> => {
