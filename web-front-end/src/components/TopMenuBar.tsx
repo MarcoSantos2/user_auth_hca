@@ -10,8 +10,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import Logo from '../Logo';
-import ColorModeIconDropdown from '../../theme/ColorModeIconDropdown';
+import Logo from './Logo';
+import ColorModeIconDropdown from '../theme/ColorModeIconDropdown';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -26,7 +26,7 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   padding: '8px 12px',
 }));
 
-export default function AppAppBar() {
+export default function TopMenuBar() {
   const [open, setOpen] = React.useState(false);
 
   const toggleDrawer = (newOpen: boolean) => () => {
@@ -70,7 +70,7 @@ export default function AppAppBar() {
           <ColorModeIconDropdown />
         </Box>
         <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
-          <ColorModeIconDropdown size="medium" />
+          <ColorModeIconDropdown />
           <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
             <MenuIcon />
           </IconButton>

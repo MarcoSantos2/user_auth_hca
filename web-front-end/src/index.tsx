@@ -1,8 +1,9 @@
+// 3rd party imports
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { StyledEngineProvider } from '@mui/material/styles';
+// local imports
 import './index.css';
-import Home from './pages/home';
+import AppBase from './AppBase';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -11,9 +12,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <StyledEngineProvider injectFirst>
-      <Home />
-    </StyledEngineProvider>
+      <AppBase />
   </React.StrictMode>
 );
 
