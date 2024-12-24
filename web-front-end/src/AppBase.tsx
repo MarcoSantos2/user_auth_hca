@@ -1,10 +1,10 @@
-import Typography from "@mui/material/Typography";
 import SiteLayout from "./layout/SiteLayout";
+import SignUp from "./pages/SignUp";
 
 export function AppBase() {
   return (
     <SiteLayout>
-      <Typography variant="h4">Content Area</Typography>
+      <SignUp />
     </SiteLayout>
   );
 }

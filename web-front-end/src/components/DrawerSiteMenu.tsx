@@ -10,7 +10,7 @@ import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
 
 import { pages } from '../constants/sitePages';
-import ColorModeIconDropdown from '../theme/ColorModeIconDropdown';
+import ColorModeIconDropdown from './ColorModeIconDropdown';
 
 interface Props {
   isLoggedIn: boolean;

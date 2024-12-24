@@ -7,7 +7,7 @@ import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
-import ColorModeIconDropdown from '../theme/ColorModeIconDropdown';
+import ColorModeIconDropdown from './ColorModeIconDropdown';
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
