@@ -1,10 +1,11 @@
 import SiteLayout from "./layout/SiteLayout";
-import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
 
 export function AppBase() {
   return (
     <SiteLayout>
-      <SignUp />
+      {/* TODO: Implement Routing Navegation */}
+      <SignIn />
     </SiteLayout>
   );
 }
