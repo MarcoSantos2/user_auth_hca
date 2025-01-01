@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserData } from '../types';
 import logger from '../utils/logger';
+import{ findUserByEmail }from '../repositories/userRepository';
 
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
@@ -26,7 +27,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     const token = await userService.signup(userData);
     logger.info(`User signed up: ${email}`);
-    res.status(201).json({ token });
+    res.status(201).json({ token, name, email });
   } catch (error) {
     logger.error(`Signup error: ${(error as Error).message}`);
     if ((error as Error).message.includes('already exists')) {
@@ -45,12 +46,20 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
     if (user) {
       const { email: userEmail, googleId } = user;
       const token = await userService.signIn({ email: userEmail, googleId });
+      const userData = await findUserByEmail(userEmail);
+      if (!userData) {
+        throw new Error('User not found');
+      }
       logger.info(`User signed in with Google: ${userEmail}`);
-      res.status(200).json({ token });
+      res.status(200).json({ token, name: userData.name, email: userData.email });
     } else if (email && password) {
       const token = await userService.signIn({ email, password });
+      const userData = await findUserByEmail(email);
+      if (!userData) {
+        throw new Error('User not found');
+      }
       logger.info(`User signed in: ${email}`);
-      res.status(200).json({ token });
+      res.status(200).json({ token, name: userData.name, email: userData.email });
     } else {
       res.status(400).json({ message: 'Missing required fields' });
     }
