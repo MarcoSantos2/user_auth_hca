@@ -4,7 +4,7 @@ import SignIn from "./pages/SignIn";
 export function AppBase() {
   return (
     <SiteLayout>
-      {/* TODO: Implement Routing Navegation */}
+      {/* TODO: Implement Routing Navigation */}
       <SignIn />
     </SiteLayout>
   );

@@ -17,7 +17,12 @@ export default function Logo() {
         display: 'flex',
         flexGrow: { xs: 1, md: 0 },
         textDecoration: 'none',
-        color: theme.palette.text.primary
+        color: theme.palette.text.primary,
+        [theme.breakpoints.down('sm')]: {
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        },
       }}
     >
       LOGO
