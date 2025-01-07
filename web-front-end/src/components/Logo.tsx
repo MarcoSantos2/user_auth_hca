@@ -18,12 +18,7 @@ export default function Logo() {
         pl: { xs: 0, md: 2 },
         display: 'flex',
         textDecoration: 'none',
-        color: theme.palette.text.primary,
-        [theme.breakpoints.down('sm')]: {
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-        },
+        color: theme.palette.text.primary
       }}
     >
       LOGO
