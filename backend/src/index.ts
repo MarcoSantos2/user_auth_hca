@@ -7,7 +7,6 @@ import roleRoutes from './routes/roles';
 import { AppDataSource } from "./datasource";
 import { getAllPermissions } from './services/permissionService'; 
 import companyRoutes from './routes/company';
-import emailRoutes from './routes/email';
 
 dotenv.config();
 
@@ -25,9 +24,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ADD ROUTES UNDER THIS COMMENT
-
-// Email routes
-app.use('/api/email', emailRoutes);
 
 // User routes - map /api/users to userRoutes
 app.use('/api/users', userRoutes);
