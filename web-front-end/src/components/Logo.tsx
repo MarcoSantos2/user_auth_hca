@@ -12,10 +12,11 @@ export default function Logo() {
       component={Link}
       href="/"
       sx={{
-        mr: { xs: 0, md: 2 },
-        px: 2,
+        mr: { xs: 'auto', md: 2 },
+        ml: { xs: 'auto', md: 0 },
+        pr: { xs: '48px', md: 2 },
+        pl: { xs: 0, md: 2 },
         display: 'flex',
-        flexGrow: { xs: 1, md: 0 },
         textDecoration: 'none',
         color: theme.palette.text.primary,
         [theme.breakpoints.down('sm')]: {
