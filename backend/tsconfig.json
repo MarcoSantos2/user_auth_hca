@@ -12,7 +12,7 @@
       "forceConsistentCasingInFileNames": true,
       "typeRoots": ["./node_modules/@types", "./src/types"] // Added typeRoots
     },
-    "include": ["src/**/*.ts"],
+    "include": ["./src/**/*.ts"],
     "exclude": ["node_modules"]
   }
   

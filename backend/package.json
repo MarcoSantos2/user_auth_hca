@@ -15,7 +15,8 @@
     "migrations": "npm run create:db && npx typeorm-ts-node-commonjs migration:run -d ./src/datasource.ts",
     "migrations:revert": "npx typeorm-ts-node-commonjs migration:revert -d ./src/datasource.ts",
     "migrations:create": "cd ./src/migrations && npx typeorm migration:create",
-    "smile": "ts-node src/scripts/smile.ts"
+    "smile": "ts-node src/scripts/smile.ts",
+    "test:email": "ts-node src/utils/email/testEmail.ts"
   },
   "repository": {
     "type": "git",
@@ -44,6 +45,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/dotenv": "^6.1.1",
+    "@types/ejs": "^3.1.5",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.0",
     "@types/jest": "^29.5.13",
