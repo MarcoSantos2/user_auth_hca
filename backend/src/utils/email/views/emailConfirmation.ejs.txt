@@ -4,12 +4,12 @@ Tap the button below to confirm your email address. If you didn't create an acco
 Do Something Sweet
 If that doesn't work, copy and paste the following link in your browser:
 
-https://same-link-as-button.url/xxx-xxx-xxxx
+<%= action_url %>
 
 Cheers,
 AideConnect
 
-You received this email because we received a request for [type_of_action] for your account. If you didn't request [type_of_action] you can safely delete this email.
+You received this email because we received a request for <%= type_of_action %> for your account. If you didn't request <%= type_of_action %> you can safely delete this email.
 
 To stop receiving these emails, you can unsubscribe at any time.
 
