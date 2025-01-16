@@ -11,12 +11,7 @@ import Divider from '@mui/material/Divider';
 import { pages } from '../constants/sitePages';
 import ColorModeIconDropdown from './ColorModeIconDropdown';
 
-interface Props {
-  isLoggedIn: boolean;
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export default function DrawerSiteMenu({isLoggedIn, setIsLoggedIn}: Props) {
+export default function DrawerSiteMenu() {
   const [anchorElNav, setAnchorElNav] =useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -60,16 +55,13 @@ export default function DrawerSiteMenu({isLoggedIn, setIsLoggedIn}: Props) {
                 </MenuItem>
               ))}
               <Divider />
-              {!isLoggedIn && <>
-                  <MenuItem key={'login'} onClick={() => setIsLoggedIn(true)}>
-                    <Typography sx={{ textAlign: 'center' }}>Login</Typography>
-                  </MenuItem>
-                  <MenuItem key={'sign-up'} component={Link} href={'/sign-up'}>
-                    <Typography sx={{ textAlign: 'center' }}>Sign Up</Typography>
-                  </MenuItem>
-                  <Divider />
-                </>
-              }
+              <MenuItem key={'login'} component={Link} href={'/sign_in'}>
+                <Typography sx={{ textAlign: 'center' }}>Login</Typography>
+              </MenuItem>
+              <MenuItem key={'sign-up'} component={Link} href={'/sign_up'}>
+                <Typography sx={{ textAlign: 'center' }}>Sign Up</Typography>
+              </MenuItem>
+              <Divider />
               <MenuItem key={'mode-selection'} sx={{ p: 0 }}>
                 <ColorModeIconDropdown inSubMenu/>
               </MenuItem>
