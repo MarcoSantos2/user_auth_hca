@@ -1,23 +1,17 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ColorModeIconDropdown from './ColorModeIconDropdown';
+import Link from '@mui/material/Link';
 
-interface Props {
-  isLoggedIn: boolean;
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export default function RegistrationMenu({isLoggedIn, setIsLoggedIn}: Props) {
-  if (isLoggedIn) {
-    return null
-  }
+export default function RegistrationMenu() {
   return (
     <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' } }}>
       <Button 
         color="primary" 
         variant="contained" 
-        size="large" 
-        onClick={() => setIsLoggedIn(true)}
+        size="large"
+        component={Link}
+        href="/sign_in"
         sx={{ m: 2}}
       >
         Log in
@@ -26,6 +20,8 @@ export default function RegistrationMenu({isLoggedIn, setIsLoggedIn}: Props) {
         color="primary" 
         variant="outlined" 
         size="large"
+        component={Link}
+        href="/sign_up"
         sx={{ m: 2}}
       >
         Sign up

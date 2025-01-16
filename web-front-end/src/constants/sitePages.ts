@@ -2,10 +2,10 @@ export const pages = [
     {
         id: 'health-providers', 
         text: 'Health Providers', 
-        to: '/health-providers'
+        to: '/health_providers'
     }, {
         id: 'care-givers', 
         text:'Care Givers', 
-        to: '/care-givers'
+        to: '/care_givers'
     }
 ];
