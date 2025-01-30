@@ -1,0 +1,21 @@
+{
+  "name": "health_care_aide_app",
+  "version": "1.0.0",
+  "description": "Backend of the Health Care Aide App",
+  "scripts": {
+    "dev": "node concurrently.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/cxfos/health_care_aide_app.git"
+  },
+  "author": "Felipe dos Santos and Marco dos Santos",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cxfos/health_care_aide_app/issues"
+  },
+  "homepage": "https://github.com/cxfos/health_care_aide_app#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

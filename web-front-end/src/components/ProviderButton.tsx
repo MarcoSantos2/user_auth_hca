@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 
 interface Props {
   label: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
 }
 
 export default function ProviderButton({label, icon}: Props) {
