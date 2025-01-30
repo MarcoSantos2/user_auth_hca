@@ -8,7 +8,8 @@ import {
         getUserById,
         addRoleToUser,
         getUserCompanies,
-        getUsers
+        getUsers,
+        resetPasswordRequest
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken, verifyPermissions, verifyAdmin } from '../middleware/authMiddleware';
@@ -25,12 +26,12 @@ router.get('/:uuid/add/role/:slug', verifyToken, verifyPermissions, addRoleToUse
 router.post('/signin', googleAuth, signin);
 router.post('/signup', googleAuth, signup);
 
+// Route to request password reset
+router.post('/reset-password', resetPasswordRequest);
+
 // Route to handle direct user signin and signup (email and password)
 router.post('/direct/signin', signin);
 router.post('/direct/signup', signup);
-
-// Routes for Admin use only
-router.get('/', verifyToken, verifyAdmin, getUsers);
 
 // Routes for Admin use only
 router.get('/', verifyToken, verifyAdmin, getUsers);

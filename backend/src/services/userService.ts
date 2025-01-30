@@ -8,6 +8,7 @@ import * as roleService from '../services/roleService';
 import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 import { GoogleAccount } from '../models/GoogleAccount';
 import { Company } from '../models/Company';
+import { sendEmail } from '../utils/email/sendEmail';
 
 export const signup = async (userData: UserData): Promise<string | null> => {
   const { email, name, password, googleId } = userData;
@@ -149,4 +150,20 @@ export const addRoleToUser = async (userUuid: string, roleSlug: string): Promise
 export const getUserCompanies = async (userUuid: string): Promise<Company[]> => {
   const user = await getUserByUuid(userUuid, false, true);
   return user.companies;
+};
+
+export const requestPasswordReset = async (email: string): Promise<void> => {
+    const user = await userRepository.findUserByEmail(email);
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    const secret = crypto.randomBytes(3).toString('hex');
+    const expires = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now.
+
+    user.reset_passkey = secret;
+    user.reset_passkey_exp = expires;
+    await userRepository.saveUser(user);
+
+    await sendEmail(user.email, 'Password Reset', `Your passkey is: ${secret}`);
 };

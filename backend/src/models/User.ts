@@ -62,6 +62,12 @@ export class User {
   @DeleteDateColumn()
   deleted_at!: Date | null;
 
+  @Column({ type: 'varchar', length: 6, nullable: true })
+  reset_passkey!: string | null;
+
+  @Column({ type: 'datetime', nullable: true })
+  reset_passkey_exp!: Date | null;
+
   toJSON() {
     return {
       uuid: this.uuid,

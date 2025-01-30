@@ -5,6 +5,7 @@ import * as userService from '../services/userService';
 import { UserData } from '../types';
 import logger from '../utils/logger';
 import{ findUserByEmail }from '../repositories/userRepository';
+import { requestPasswordReset } from '../services/userService';
 
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
@@ -177,4 +178,14 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
+};
+
+export const resetPasswordRequest = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { email } = req.body;
+        await requestPasswordReset(email);
+        res.status(200).json({ message: 'Password reset email sent' });
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
+    }
 };
