@@ -1,7 +1,9 @@
 import "reflect-metadata";
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 import path from 'path';
 import dotenv from 'dotenv';
+
 import userRoutes from './routes/users';
 import roleRoutes from './routes/roles';
 import { AppDataSource } from "./datasource";
@@ -12,6 +14,7 @@ dotenv.config();
 
 const app: express.Express = express();
 const port = process.env.PORT || 3000;
+const corsOrigins = process.env.CORS_ORIGINS || "";
 
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
@@ -19,6 +22,15 @@ app.set('views', path.join(__dirname, '../views'));
 
 // Middleware to parse JSON
 app.use(express.json());
+
+// Middleware to enable CORS
+const corsOptions = {
+  origin: corsOrigins.split(','),
+  credentials: true,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+console.log(corsOptions);
+app.use(cors(corsOptions));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '../public')));

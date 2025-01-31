@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 
 interface Props {
   children?: React.ReactNode,
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  onSubmit?: (event: React.FormEvent<any>) => void
 }
 
 export default function StyledForm({children, onSubmit}: Props) {
