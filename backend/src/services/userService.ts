@@ -158,12 +158,19 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
         throw new Error('User not found');
     }
 
-    const secret = crypto.randomBytes(3).toString('hex');
+    const passkey = crypto.randomBytes(3).toString('hex');
     const expires = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now.
 
-    user.reset_passkey = secret;
+    user.reset_passkey = passkey;
     user.reset_passkey_exp = expires;
     await userRepository.saveUser(user);
 
-    await sendEmail(user.email, 'Password Reset', `Your passkey is: ${secret}`);
+    await sendEmail(user.email, 'Password Reset', 'resetPassword', {
+        name: user.name || 'User',
+        passkey: passkey,
+        action_url: `https://ourapp.com/reset-password?passkey=${passkey}`,
+        operating_system: 'Unknown OS', // TODO: Replace with actual data if available
+        browser_name: 'Unknown Browser', // TODO: Replace with actual data if available
+        support_url: 'https://ourapp.com/support',
+    });
 };
