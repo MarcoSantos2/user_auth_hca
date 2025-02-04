@@ -18,14 +18,21 @@ export const sendEmail = async (to: string, subject: string, templateName: strin
   });
 
   try {
-    // Define the path to the EJS template
     const templatePath = path.join(__dirname, 'views', `${templateName}.ejs`);
 
+    // Add environment variables to the template data
+    const dataWithEnv = {
+      ...templateData,
+      // Add other environment variables here
+      product_name: process.env.PRODUCT_NAME,
+      
+    };
+
     // Render the EJS template with the provided data
-    const html = await ejs.renderFile(templatePath, templateData);
+    const html = await ejs.renderFile(templatePath, dataWithEnv);
 
     const info = await transporter.sendMail({
-      from: `"Health Care Aide" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.SENDER_NAME}" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,

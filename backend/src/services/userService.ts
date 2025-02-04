@@ -9,6 +9,9 @@ import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 import { GoogleAccount } from '../models/GoogleAccount';
 import { Company } from '../models/Company';
 import { sendEmail } from '../utils/email/sendEmail';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const signup = async (userData: UserData): Promise<string | null> => {
   const { email, name, password, googleId } = userData;
@@ -159,7 +162,8 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
     }
 
     const passkey = crypto.randomBytes(3).toString('hex');
-    const expires = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now.
+    const expirationMinutes = parseInt(process.env.RESET_PASSKEY_EXPIRATION_MINUTES || '20', 10); // default 20 minutes if not set
+    const expires = new Date(Date.now() + expirationMinutes * 60 * 1000);
 
     user.reset_passkey = passkey;
     user.reset_passkey_exp = expires;
@@ -169,8 +173,5 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
         name: user.name || 'User',
         passkey: passkey,
         action_url: `https://ourapp.com/reset-password?passkey=${passkey}`,
-        operating_system: 'Unknown OS', // TODO: Replace with actual data if available
-        browser_name: 'Unknown Browser', // TODO: Replace with actual data if available
-        support_url: 'https://ourapp.com/support',
     });
 };
