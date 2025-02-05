@@ -9,9 +9,6 @@ import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 import { GoogleAccount } from '../models/GoogleAccount';
 import { Company } from '../models/Company';
 import { sendEmail } from '../utils/email/sendEmail';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export const signup = async (userData: UserData): Promise<string | null> => {
   const { email, name, password, googleId } = userData;
@@ -172,6 +169,9 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
     await sendEmail(user.email, 'Password Reset', 'resetPassword', {
         name: user.name || 'User',
         passkey: passkey,
-        action_url: `https://ourapp.com/reset-password?passkey=${passkey}`,
+        action_url: `${process.env.APP_URL}/reset-password?passkey=${passkey}`,
+        operating_system: 'Unknown OS', // TODO: Replace with actual data if available
+        browser_name: 'Unknown Browser', // TODO: Replace with actual data if available
+        support_url: `${process.env.APP_URL}/support`,
     });
 };
