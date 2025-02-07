@@ -39,7 +39,7 @@ export async function googleAuth(req: Request, res: Response, next: NextFunction
   }
 }
 
-export const generateToken = (user: any) => {
+export const generateToken = (user: any) => {      // TODO: Move to utils
     const secret = process.env.JWT_SECRET as string;
     return jwt.sign(user, secret, { expiresIn: '1h' });
   };

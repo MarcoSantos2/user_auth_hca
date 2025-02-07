@@ -175,3 +175,23 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
         support_url: `${process.env.APP_URL}/support`,
     });
 };
+
+export const verifyPasskey = async (email: string, passkey: string): Promise<string | null> => {
+  const user = await userRepository.findUserByEmail(email);
+  if (!user || user.reset_passkey !== passkey) {
+    return null;
+  }
+
+  const now = new Date();
+  if (user.reset_passkey_exp && user.reset_passkey_exp < now) {
+    return null;
+  }
+
+  const token = generateToken({ uuid: user.uuid, email: user.email });
+
+  user.reset_passkey = null;
+  user.reset_passkey_exp = null;
+  await userRepository.saveUser(user);
+
+  return token;
+};

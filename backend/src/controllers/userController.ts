@@ -189,3 +189,25 @@ export const resetPasswordRequest = async (req: Request, res: Response): Promise
         res.status(500).json({ message: (error as Error).message });
     }
 };
+
+export const verifyPasskey = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, passkey } = req.body;
+
+    if (!email || !passkey) {
+      res.status(400).json({ message: 'Email and passkey are required' });
+      return;
+    }
+
+    const token = await userService.verifyPasskey(email, passkey);
+    if (token) {
+      res.status(200).json({ token });
+    } else {
+      res.status(401).json({ message: 'Invalid or expired passkey' });
+    }
+  } catch (error) {
+    logger.error(`Passkey verification error: ${(error as Error).message}`);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+

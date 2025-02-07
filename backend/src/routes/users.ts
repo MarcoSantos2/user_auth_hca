@@ -9,7 +9,8 @@ import {
         addRoleToUser,
         getUserCompanies,
         getUsers,
-        resetPasswordRequest
+        resetPasswordRequest,
+        verifyPasskey
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken, verifyPermissions, verifyAdmin } from '../middleware/authMiddleware';
@@ -52,5 +53,7 @@ router.get('/:id', verifyToken, verifyPermissions, getUserById);
 router.patch('/:id', verifyToken, verifyPermissions, updateUser); 
 router.delete('/:id', verifyToken, verifyPermissions, deleteUser);
 
+// Route to verify passkey
+router.post('/verify-passkey', verifyPasskey);
 
 export default router;
