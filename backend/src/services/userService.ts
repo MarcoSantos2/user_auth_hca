@@ -170,8 +170,8 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
         name: user.name || 'User',
         passkey: passkey,
         action_url: `${process.env.APP_URL}/reset-password?passkey=${passkey}`,
-        operating_system: 'Unknown OS', // TODO: Replace with actual data if available
-        browser_name: 'Unknown Browser', // TODO: Replace with actual data if available
+        operating_system: 'Unknown OS', // TODO: Replace with actual data if available, need to obtain from user
+        browser_name: 'Unknown Browser', // TODO: Replace with actual data if available, need to obtain from user
         support_url: `${process.env.APP_URL}/support`,
     });
 };
