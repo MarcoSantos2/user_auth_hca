@@ -10,11 +10,8 @@ import {
         getUserCompanies,
         getUsers,
         resetPasswordRequest,
-<<<<<<< HEAD
-        verifyPasskey
-=======
+        verifyPasskey,
         changePassword
->>>>>>> 5e5ca4a... create endpoint to change pw
         } from '../controllers/userController';
 import { googleAuth } from '../middleware/googleAuth';
 import { verifyToken, verifyPermissions, verifyAdmin } from '../middleware/authMiddleware';
@@ -57,12 +54,7 @@ router.get('/:id', verifyToken, verifyPermissions, getUserById);
 router.patch('/:id', verifyToken, verifyPermissions, updateUser); 
 router.delete('/:id', verifyToken, verifyPermissions, deleteUser);
 
-<<<<<<< HEAD
-// Route to verify passkey
 router.post('/verify-passkey', verifyPasskey);
-=======
-// Route to change password
 router.post('/change-password', verifyToken, changePassword);
->>>>>>> 5e5ca4a... create endpoint to change pw
 
 export default router;

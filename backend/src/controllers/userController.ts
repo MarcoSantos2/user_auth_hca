@@ -199,7 +199,7 @@ export const verifyPasskey = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const token = await userService.verifyPasskey(email, passkey);
+    const token = await userService.verifyPasskey(email, passkey); // TODO: FELIPE - Should the token also have an expiration time? I noticed that I can use the token to change the PW multiple times.
     if (token) {
       res.status(200).json({ token });
     } else {
@@ -207,6 +207,25 @@ export const verifyPasskey = async (req: Request, res: Response): Promise<void> 
     }
   } catch (error) {
     logger.error(`Passkey verification error: ${(error as Error).message}`);
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { newPassword } = req.body;
+    const userId = req.body.user?.uuid; // TODO: Ask Felipe during call about this again :`/ Can you explain what's happening here exactly? What's the dif between 
+    // req.user = user AND req.body.user = user AND req.params.id
+
+    if (!newPassword) {
+      res.status(400).json({ message: 'New password is required' });
+      return;
+    }
+
+    await userService.changePassword(userId, newPassword);
+    res.status(200).json({ message: 'Password changed successfully' });
+  } catch (error) {
+    logger.error(`Change password error: ${(error as Error).message}`);
     res.status(500).json({ message: (error as Error).message });
   }
 };

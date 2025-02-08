@@ -4,7 +4,7 @@ import { User } from '../models/User'; // Import the shared User interface
 import { hashPassword, comparePassword, generateToken } from '../middleware/googleAuth';
 import * as userRepository from '../repositories/userRepository';
 import * as googleRepository from '../repositories/googleAccountRepository';
-import * as roleService from '../services/roleService';
+import * as roleService from './roleService';
 import { DirectLoginPayload, ExternalLoginPayload, UserData } from '../types';
 import { GoogleAccount } from '../models/GoogleAccount';
 import { Company } from '../models/Company';
@@ -189,9 +189,25 @@ export const verifyPasskey = async (email: string, passkey: string): Promise<str
 
   const token = generateToken({ uuid: user.uuid, email: user.email });
 
+  await userRepository.saveUser(user);
+
+  return token;
+};
+
+export const changePassword = async (userId: string, newPassword: string): Promise<void> => {
+  const user = await userRepository.findUserByUuid(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  user.password = hashPassword(newPassword);
   user.reset_passkey = null;
   user.reset_passkey_exp = null;
   await userRepository.saveUser(user);
 
-  return token;
+  await sendEmail(user.email, 'Password Changed', 'passwordChanged', {
+    name: user.name || 'User',
+    product_name: process.env.PRODUCT_NAME,
+  });
+  
 };
