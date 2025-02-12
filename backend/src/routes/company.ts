@@ -15,6 +15,10 @@ router.delete('/', verifyToken, verifyPermissions, companyController.deleteCompa
 // Routes for Admin use only
 router.get('/all', verifyToken, verifyAdmin, companyController.getAllCompanies);
 
+// Invite user to join company
+router.post('/invite', verifyToken, verifyPermissions, companyController.inviteUserToCompany);
+router.get('/accept-invite', verifyToken, companyController.acceptCompanyInvite);
+
 // TODO - Change Middleware that verify permissions to one specific for INTERNAL USE Validation
 
 export default router;

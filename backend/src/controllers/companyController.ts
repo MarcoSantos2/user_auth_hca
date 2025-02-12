@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as companyService from '../services/companyService';
+import { sendEmail } from '../utils/email/sendEmail';
 
 export const createCompany = async (req: Request, res: Response): Promise<void> => {
   const { name, description } = req.body;
@@ -84,4 +85,39 @@ export const getAllCompanies = async (req: Request, res: Response): Promise<void
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
     }
+};
+
+export const inviteUserToCompany = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, email, companyUuid } = req.body;
+    const inviter = req.body.user; // Assuming the inviter's user info is in req.user
+
+    if (!name || !email || !companyUuid) {
+      res.status(400).json({ message: 'Name, email, and company UUID are required' });
+      return;
+    }
+
+    await companyService.inviteUserToCompany(name, email, companyUuid, inviter);
+
+    res.status(200).json({ message: 'Invitation sent successfully' });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const acceptCompanyInvite = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { token } = req.query; // Assuming the invite token is passed as a query parameter
+
+    if (!token) {
+      res.status(400).json({ message: 'Invite token is required' });
+      return;
+    }
+
+    await companyService.acceptCompanyInvite(token as string, req.user);
+
+    res.status(200).json({ message: 'Successfully joined the company' });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
 };

@@ -6,6 +6,8 @@ import { Company } from '../models/Company';
 import { User } from '../models/User';
 import { Role } from '../models/Role';
 import { findUserByUuid } from '../repositories/userRepository';
+import { sendEmail } from '../utils/email/sendEmail';
+import jwt from 'jsonwebtoken';
 
 export const createCompany = async (companyData: { name: string; description?: string }, user: User): Promise<Company> => {
     // Create the company
@@ -110,3 +112,39 @@ export const isUserInCompany = async (companyUuid: string, user: User): Promise<
   }
   return company.users.some(u => u.id === user.id);
 }
+
+export const inviteUserToCompany = async (name: string, email: string, companyUuid: string, inviter: User): Promise<void> => {
+  const company = await companyRepository.findCompanyByUuid(companyUuid);
+  if (!company) {
+    throw new Error('Company not found');
+  }
+
+  const inviteToken = jwt.sign({ email, companyUuid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
+
+  const inviteUrl = `${process.env.APP_URL}/accept-invite?token=${inviteToken}`;
+
+  await sendEmail(email, 'You are invited to join a company', 'companyInviteUser', {
+    name,
+    invite_sender_name: inviter.name,
+    invite_sender_organization_name: company.name,
+    action_url: inviteUrl,
+    support_email: process.env.SUPPORT_EMAIL,
+    help_url: process.env.HELP_URL,
+    product_name: process.env.PRODUCT_NAME,
+  });
+};
+
+export const acceptCompanyInvite = async (token: string, user: User): Promise<void> => {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { email: string; companyUuid: string };
+
+  if (decoded.email !== user.email) {
+    throw new Error('Invalid invite token');
+  }
+
+  const company = await companyRepository.findCompanyByUuid(decoded.companyUuid);
+  if (!company) {
+    throw new Error('Company not found');
+  }
+
+  await addUserToCompany(company.uuid, user.uuid);
+};
