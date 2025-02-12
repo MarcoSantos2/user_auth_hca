@@ -1,8 +1,6 @@
 // src/middleware/googleAuth.ts
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -39,16 +37,7 @@ export async function googleAuth(req: Request, res: Response, next: NextFunction
   }
 }
 
-export const generateToken = (user: any) => {      // TODO: Move to utils
-    const secret = process.env.JWT_SECRET as string;
-    return jwt.sign(user, secret, { expiresIn: '1h' });
-  };
+
   
-export const hashPassword = (password: string) => {
-    return bcrypt.hashSync(password, 10);
-  };
-  
-export const comparePassword = (password: string, hash: string) => {
-    return bcrypt.compareSync(password, hash);
-  };
+
   

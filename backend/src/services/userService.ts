@@ -1,7 +1,8 @@
 // Business logic implementation
 import crypto from 'crypto';
 import { User } from '../models/User'; // Import the shared User interface
-import { hashPassword, comparePassword, generateToken } from '../middleware/googleAuth';
+import { hashPassword, comparePassword } from '../utils/passwordHelper';
+import { generateToken } from '../utils/tokenHelper';
 import * as userRepository from '../repositories/userRepository';
 import * as googleRepository from '../repositories/googleAccountRepository';
 import * as roleService from './roleService';
@@ -194,10 +195,10 @@ export const verifyPasskey = async (email: string, passkey: string): Promise<str
   return token;
 };
 
-export const changePassword = async (userId: string, newPassword: string): Promise<void> => {
-  const user = await userRepository.findUserByUuid(userId);
-  if (!user) {
-    throw new Error('User not found');
+export const changePassword = async (user: User, newPassword: string): Promise<void> => {
+  
+  if (comparePassword(newPassword, user.password!)) {
+    throw new Error('New password cannot be the same as the old password');
   }
 
   user.password = hashPassword(newPassword);
@@ -208,6 +209,5 @@ export const changePassword = async (userId: string, newPassword: string): Promi
   await sendEmail(user.email, 'Password Changed', 'passwordChanged', {
     name: user.name || 'User',
     product_name: process.env.PRODUCT_NAME,
-  });
-  
+  }); 
 };
