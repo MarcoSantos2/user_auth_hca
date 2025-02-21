@@ -135,10 +135,11 @@ export const inviteUserToCompany = async (name: string, email: string, companyUu
 };
 
 export const acceptCompanyInvite = async (token: string, user: User): Promise<void> => {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { email: string; companyUuid: string };
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { email: string; companyUuid: string };
 
   if (decoded.email !== user.email) {
-    throw new Error('Invalid invite token');
+    throw new Error('You must log in using the email address that was invited.');
   }
 
   const company = await companyRepository.findCompanyByUuid(decoded.companyUuid);
@@ -146,5 +147,8 @@ export const acceptCompanyInvite = async (token: string, user: User): Promise<vo
     throw new Error('Company not found');
   }
 
-  await addUserToCompany(company.uuid, user.uuid);
+    await addUserToCompany(company.uuid, user.uuid);
+  } catch (error) {
+    throw new Error('Invalid or expired invite token');
+  }
 };

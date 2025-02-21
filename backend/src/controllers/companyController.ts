@@ -90,7 +90,12 @@ export const getAllCompanies = async (req: Request, res: Response): Promise<void
 export const inviteUserToCompany = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, companyUuid } = req.body;
-    const inviter = req.body.user; // Assuming the inviter's user info is in req.user
+    const inviter = req.body.user; //TODO - CHECK IF THIS IS CORRECT
+
+    const existingMembership = await companyService.isUserInCompany(companyUuid, email);
+    if (existingMembership) {
+      throw new Error('User is already a member of the company');
+    }
 
     if (!name || !email || !companyUuid) {
       res.status(400).json({ message: 'Name, email, and company UUID are required' });
@@ -107,14 +112,14 @@ export const inviteUserToCompany = async (req: Request, res: Response): Promise<
 
 export const acceptCompanyInvite = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { token } = req.query; // Assuming the invite token is passed as a query parameter
+    const { token } = req.body;
 
     if (!token) {
       res.status(400).json({ message: 'Invite token is required' });
       return;
     }
 
-    await companyService.acceptCompanyInvite(token as string, req.user);
+    await companyService.acceptCompanyInvite(token as string, req.body);
 
     res.status(200).json({ message: 'Successfully joined the company' });
   } catch (error) {
