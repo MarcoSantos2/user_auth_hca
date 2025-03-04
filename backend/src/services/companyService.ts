@@ -101,7 +101,10 @@ export const addUserToCompany = async (companyUuid: string, userUuid: string): P
 
   if (!company.users.some(u => u.id === user.id)) {
     company.users.push(user);
+  } else {
+    throw new Error('User is already a member of the company');
   }
+  
   return await companyRepository.save(company);
 };
 
@@ -113,15 +116,12 @@ export const isUserInCompany = async (companyUuid: string, user: User): Promise<
   return company.users.some(u => u.id === user.id);
 }
 
-export const inviteUserToCompany = async (name: string, email: string, companyUuid: string, inviter: User): Promise<void> => {
-  const company = await companyRepository.findCompanyByUuid(companyUuid);
-  if (!company) {
-    throw new Error('Company not found');
-  }
-
-  const inviteToken = jwt.sign({ email, companyUuid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
+export const inviteUserToCompany = async (name: string, email: string, company: Company, inviter: User): Promise<void> => {
+  
+  const inviteToken = jwt.sign({ email, companyUuid: company.uuid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
 
   const inviteUrl = `${process.env.APP_URL}/accept-invite?token=${inviteToken}`;
+  console.log(inviteToken);
 
   await sendEmail(email, 'You are invited to join a company', 'companyInviteUser', {
     name,
@@ -134,9 +134,13 @@ export const inviteUserToCompany = async (name: string, email: string, companyUu
   });
 };
 
-export const acceptCompanyInvite = async (token: string, user: User): Promise<void> => {
+export const acceptCompanyInvite = async (inviteToken: string, user: User): Promise<void> => {
+  let decoded;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { email: string; companyUuid: string };
+    decoded = jwt.verify(inviteToken, process.env.JWT_SECRET || '') as { email: string; companyUuid: string };
+  } catch (error) {
+    throw new Error('Invalid or expired invite token');
+  }
 
   if (decoded.email !== user.email) {
     throw new Error('You must log in using the email address that was invited.');
@@ -146,9 +150,6 @@ export const acceptCompanyInvite = async (token: string, user: User): Promise<vo
   if (!company) {
     throw new Error('Company not found');
   }
+  await addUserToCompany(company.uuid, user.uuid);
 
-    await addUserToCompany(company.uuid, user.uuid);
-  } catch (error) {
-    throw new Error('Invalid or expired invite token');
-  }
 };

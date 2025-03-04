@@ -118,6 +118,10 @@ export const updateUser = async (uuid: string, updates: Partial<User>) => {
   return await userRepository.saveUser(user);
 };
 
+export const getUserByEmail = async (email: string): Promise<User | null> => {
+  return await userRepository.findUserByEmail(email);
+};
+
 export const getUserByUuid = async (uuid: string, withRoles?: boolean, withCompanies?: boolean) => {
   const user = await userRepository.findUserByUuid(uuid, withRoles, withCompanies);
   if (!user) {

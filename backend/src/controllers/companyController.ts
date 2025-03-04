@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as companyService from '../services/companyService';
-import { sendEmail } from '../utils/email/sendEmail';
+import * as userService from '../services/userService';
 
 export const createCompany = async (req: Request, res: Response): Promise<void> => {
   const { name, description } = req.body;
@@ -89,20 +89,22 @@ export const getAllCompanies = async (req: Request, res: Response): Promise<void
 
 export const inviteUserToCompany = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, companyUuid } = req.body;
-    const inviter = req.body.user; //TODO - CHECK IF THIS IS CORRECT
+    const { name, email, user: staffUser, company } = req.body;
 
-    const existingMembership = await companyService.isUserInCompany(companyUuid, email);
-    if (existingMembership) {
-      throw new Error('User is already a member of the company');
+    const userInvited = await userService.getUserByEmail(email);
+    if (userInvited) {
+      const existingMembership = await companyService.isUserInCompany(company.uuid, userInvited);
+      if (existingMembership) {
+        throw new Error('User is already a member of the company');
     }
+  }
 
-    if (!name || !email || !companyUuid) {
-      res.status(400).json({ message: 'Name, email, and company UUID are required' });
+    if (!name || !email || !company) {
+      res.status(400).json({ message: 'Name, email, and company are required' });
       return;
     }
 
-    await companyService.inviteUserToCompany(name, email, companyUuid, inviter);
+    await companyService.inviteUserToCompany(name, email, company, staffUser);
 
     res.status(200).json({ message: 'Invitation sent successfully' });
   } catch (error) {
@@ -112,14 +114,13 @@ export const inviteUserToCompany = async (req: Request, res: Response): Promise<
 
 export const acceptCompanyInvite = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { token } = req.body;
-
-    if (!token) {
+    const { invite_token: inviteToken, user } = req.body;
+    if (!inviteToken) {
       res.status(400).json({ message: 'Invite token is required' });
       return;
     }
 
-    await companyService.acceptCompanyInvite(token as string, req.body);
+    await companyService.acceptCompanyInvite(inviteToken as string, user);
 
     res.status(200).json({ message: 'Successfully joined the company' });
   } catch (error) {

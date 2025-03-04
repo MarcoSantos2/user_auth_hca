@@ -14,7 +14,7 @@
     "create:db": "ts-node src/scripts/createDb.ts",
     "migrations": "npm run create:db && npx typeorm-ts-node-commonjs migration:run -d ./src/datasource.ts",
     "migrations:revert": "npx typeorm-ts-node-commonjs migration:revert -d ./src/datasource.ts",
-    "migrations:create": "cd ./src/migrations && npx typeorm migration:create",
+    "migrations:create": "echo 'Enter the migration name: ' && read migrationName && cd ./src/migrations && npx typeorm migration:create $migrationName",
     "smile": "ts-node src/scripts/smile.ts",
     "test:email": "ts-node src/scripts/testEmail.ts"
   },

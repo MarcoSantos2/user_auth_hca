@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 import * as userService from '../services/userService';
 import { UserData } from '../types';
 import logger from '../utils/logger';
-import{ findUserByEmail }from '../repositories/userRepository';
 import { requestPasswordReset } from '../services/userService';
 
 
@@ -47,7 +46,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
     if (user) {
       const { email: userEmail, googleId } = user;
       const token = await userService.signIn({ email: userEmail, googleId });
-      const userData = await findUserByEmail(userEmail);
+      const userData = await userService.getUserByEmail(userEmail);
       if (!userData) {
         throw new Error('User not found');
       }
@@ -55,7 +54,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
       res.status(200).json({ token, name: userData.name, email: userData.email });
     } else if (email && password) {
       const token = await userService.signIn({ email, password });
-      const userData = await findUserByEmail(email);
+      const userData = await userService.getUserByEmail(email);
       if (!userData) {
         throw new Error('User not found');
       }
