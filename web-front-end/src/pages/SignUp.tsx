@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import Alert from '@mui/material/Alert';
@@ -32,6 +32,35 @@ export const SignUp: React.FC = () => {
   const [alertContent, setAlertContent] = useState('');
   // const [errors, setErrors] = useState<Record<string, string[]> | null>(null);  // TODO implement error improved error handling per field
 
+
+    useEffect(() => {
+        google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: onGoogleResponse,
+          ux_mode: 'popup',
+          context: 'signup',
+          prompt_parent_id: 'sign_up_google_button',
+        });
+    }, []);
+  
+    const onGoogleResponse = useCallback(async (credentialResponse: CredentialResponse) => {
+      const data = {
+        token: credentialResponse.credential
+      };
+      const options = getApiOptions('POST', data);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/signup`, options);
+  
+      if(response.ok){
+          const data = await response.json();
+          auth.login(data);
+      } else {
+          const responseBody = await response.json();
+          setAlert(true);
+          setAlertContent(responseBody.message);
+          // setErrors(responseBody.errors);  // TODO implement error improved error handling per field
+      }
+    }, []);
+  
   const onSubmit = useCallback(async (event: React.FormEvent<SignUpFormElement>) => {
       event.preventDefault();
       const formElements = event.currentTarget.elements;
@@ -48,7 +77,7 @@ export const SignUp: React.FC = () => {
         password: formElements.password.value
       };
       const options = getApiOptions('POST', data);
-      const response = await fetch('http://localhost:3000/api/users/direct/signup', options); // TODO get the actual url domain from environment
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/direct/signup`, options);
 
       if(response.ok){
           const data = await response.json();
@@ -76,7 +105,7 @@ export const SignUp: React.FC = () => {
             </Box>
             <SubmitButton >{'Sign Up'}</SubmitButton>
             <StyledDivider>{'or'}</StyledDivider>
-            <ProviderButton label="Continue with Google" icon={<Google className="h-5 w-5" />} />
+            <ProviderButton id="sign_up_google_button" label="Continue with Google" icon={<Google className="h-5 w-5" />} onClick={() => google.accounts.id.prompt()} />
         </StyledForm>
       </Box>
     </Fade>

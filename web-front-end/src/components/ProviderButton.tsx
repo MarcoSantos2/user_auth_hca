@@ -1,17 +1,19 @@
-import Button from '@mui/material/Button';
+import Button, { ButtonProps } from '@mui/material/Button';
+import { MouseEventHandler } from 'react';
 
 interface Props {
   label: string;
   icon: React.ReactNode;
 }
 
-export default function ProviderButton({label, icon}: Props) {
+export default function ProviderButton(props: Omit<ButtonProps, 'startIcon' | 'variant' | 'size' | 'fullWidth'> & Props) {
   return (<Button
     variant="outlined"
     fullWidth
     size="large"
-    startIcon={icon}
+    startIcon={props.icon}
+    {...props}
   >
-    {label}
+    {props.label}
   </Button>);
 }
