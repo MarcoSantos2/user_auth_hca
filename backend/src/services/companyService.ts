@@ -116,21 +116,20 @@ export const isUserInCompany = async (companyUuid: string, user: User): Promise<
   return company.users.some(u => u.id === user.id);
 }
 
-export const inviteUserToCompany = async (name: string, email: string, company: Company, inviter: User): Promise<void> => {
-  
-  const inviteToken = jwt.sign({ email, companyUuid: company.uuid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
+export const inviteUserToCompany = async (inviteeName: string, inviteeEmail: string, company: Company, inviter: User): Promise<void> => {
+  const inviteToken = jwt.sign({ email: inviteeEmail, companyUuid: company.uuid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
 
   const inviteUrl = `${process.env.APP_URL}/accept-invite?token=${inviteToken}`;
-  console.log(inviteToken);
 
-  await sendEmail(email, 'You are invited to join a company', 'companyInviteUser', {
-    name,
-    invite_sender_name: inviter.name,
-    invite_sender_organization_name: company.name,
+  await sendEmail(inviteeEmail, 'You are invited to join a company', 'companyInviteUser', {
+    invitee_name: inviteeName,
+    inviter_sender_organization_name: company.name,
     action_url: inviteUrl,
     support_email: process.env.SUPPORT_EMAIL,
     help_url: process.env.HELP_URL,
     product_name: process.env.PRODUCT_NAME,
+    organization_name: process.env.ORGANIZATION_NAME,
+    app_url: process.env.APP_URL
   });
 };
 

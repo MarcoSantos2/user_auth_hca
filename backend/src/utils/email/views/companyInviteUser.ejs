@@ -123,7 +123,7 @@
       -webkit-text-size-adjust: none;
       box-sizing: border-box;
     }
-    
+
     .button--green {
       background-color: #22BC66;
       border-top: 10px solid #22BC66;
@@ -437,15 +437,15 @@
   <![endif]-->
   </head>
   <body>
-    <span class="preheader">{{invite_sender_name}} with {{invite_sender_organization_name}} has invited you to use [Product Name] to collaborate with them.</span>
+    <span class="preheader"><%= inviter_sender_organization_name %> has invited you to use <%= product_name %> to collaborate with them.</span>
     <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
       <tr>
         <td align="center">
           <table class="email-content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
             <tr>
               <td class="email-masthead">
-                <a href="https://example.com" class="f-fallback email-masthead_name">
-                [Product Name]
+                <a href="<%= app_url %>" class="f-fallback email-masthead_name">
+                <%= product_name %>
               </a>
               </td>
             </tr>
@@ -457,8 +457,8 @@
                   <tr>
                     <td class="content-cell">
                       <div class="f-fallback">
-                        <h1>Hi, {{name}}!</h1>
-                        <p>{{invite_sender_name}} with {{invite_sender_organization_name}} has invited you to use [Product Name] to collaborate with them. Use the button below to set up your account and get started:</p>
+                        <h1>Hi, <%= invitee_name %>!</h1>
+                        <p><%= inviter_sender_organization_name %> has invited you to use <%= product_name %> to collaborate with them. Use the button below to set up your account and get started:</p>
                         <!-- Action -->
                         <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                           <tr>
@@ -468,23 +468,22 @@
                               <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
                                 <tr>
                                   <td align="center">
-                                    <a href="{{action_url}}" class="f-fallback button" target="_blank">Set up account</a>
-                                  </td>
-                                </tr>
+                                    <a href="<%= action_url %>" class="button f-fallback" style="color: #ffffff" target="_blank">Set up account</a>
+                                  </tr>
                               </table>
                             </td>
                           </tr>
                         </table>
-                        <p>If you have any questions for {{invite_sender_name}}, you can reply to this email and it will go right to them. Alternatively, feel free to <a href="mailto:{{support_email}}">contact our customer success team</a> anytime. (We're lightning quick at replying.)</p>
+                        <p> If you face any issues, feel free to <a href="mailto:<%= support_email %>">contact our customer success team</a>.</p>
                         <p>Welcome aboard,
-                          <br>The [Product Name] team</p>
-                        <p><strong>P.S.</strong> Need help getting started? Check out our <a href="{{help_url}}">help documentation</a>.</p>
+                          <br>The <%= product_name %> team</p>
+                        <p><strong>P.S.</strong> Need help getting started? Check out our <a href="<%= help_url %>">help documentation</a>.</p>
                         <!-- Sub copy -->
                         <table class="body-sub" role="presentation">
                           <tr>
                             <td>
                               <p class="f-fallback sub">If you’re having trouble with the button above, copy and paste the URL below into your web browser.</p>
-                              <p class="f-fallback sub">{{action_url}}</p>
+                              <p class="f-fallback sub"><%= action_url %></p>
                             </td>
                           </tr>
                         </table>
@@ -500,9 +499,7 @@
                   <tr>
                     <td class="content-cell" align="center">
                       <p class="f-fallback sub align-center">
-                        [AideConnect, LLC]
-                        <br>1234 Smart St.
-                        <br>Suite 4242
+                        <%= product_name %> powered by <%= organization_name %>
                       </p>
                     </td>
                   </tr>
