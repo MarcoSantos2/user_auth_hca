@@ -217,5 +217,6 @@ export const changePassword = async (user: User, newPassword: string): Promise<v
   await sendEmail(user.email, 'Password Changed', 'passwordChanged', {
     name: user.name || 'User',
     product_name: process.env.PRODUCT_NAME,
+    organization_name: process.env.ORGANIZATION_NAME
   }); 
 };
