@@ -8,10 +8,14 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
 
-import { pages } from '../constants/sitePages';
 import ColorModeIconDropdown from './ColorModeIconDropdown';
+import { pages } from '../constants/sitePages';
+import { useAuth } from '../context';
+import { useNavigate } from 'react-router';
 
 export default function DrawerSiteMenu() {
+  const navigate = useNavigate();
+  const auth = useAuth();
   const [anchorElNav, setAnchorElNav] =useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -20,6 +24,11 @@ export default function DrawerSiteMenu() {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleLogout = () => {
+    auth.logout();
+    navigate('/');
   };
 
   return (
@@ -55,12 +64,24 @@ export default function DrawerSiteMenu() {
                 </MenuItem>
               ))}
               <Divider />
-              <MenuItem key={'login'} component={Link} href={'/sign_in'}>
-                <Typography sx={{ textAlign: 'center' }}>Login</Typography>
-              </MenuItem>
-              <MenuItem key={'sign-up'} component={Link} href={'/sign_up'}>
-                <Typography sx={{ textAlign: 'center' }}>Sign Up</Typography>
-              </MenuItem>
+              {auth.isLogin() ? 
+                (
+                  [
+                    <MenuItem key={'logout'} onClick={handleLogout}>
+                      <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
+                    </MenuItem>
+                  ]                
+                ) : (
+                  [
+                    <MenuItem key={'login'} component={Link} href={'/sign_in'}>
+                      <Typography sx={{ textAlign: 'center' }}>Login</Typography>
+                    </MenuItem>,
+                    <MenuItem key={'sign-up'} component={Link} href={'/sign_up'}>
+                      <Typography sx={{ textAlign: 'center' }}>Sign Up</Typography>
+                    </MenuItem>
+                  ]
+                )
+              }
               <Divider />
               <MenuItem key={'mode-selection'} sx={{ p: 0 }}>
                 <ColorModeIconDropdown inSubMenu/>

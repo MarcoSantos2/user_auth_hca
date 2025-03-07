@@ -6,8 +6,11 @@ import DrawerSiteMenu from '../components/DrawerSiteMenu';
 import Logo from '../components/Logo';
 import PagesMenu from '../components/PagesMenu';
 import RegistrationMenu from '../components/RegistrationMenu';
+import LoggedUserMenu from '../components/LoggedUserMenu';
+import { useAuth } from '../context';
 
 function SiteHeader() {
+  const auth = useAuth();
 
   return (
     <AppBar 
@@ -19,7 +22,7 @@ function SiteHeader() {
           <DrawerSiteMenu />
           <Logo />
           <PagesMenu />
-          <RegistrationMenu />
+          {auth.isLogin() ? <LoggedUserMenu /> : <RegistrationMenu />}
         </Toolbar>
       </Container>
     </AppBar>

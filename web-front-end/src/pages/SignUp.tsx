@@ -13,6 +13,7 @@ import StyledForm from '../components/StyledForm';
 import StyledFormTitle from '../components/StyledFormTitle';
 import { useAuth } from '../context';
 import { getApiOptions } from '../utils/getApiOptions';
+import { useNavigate } from 'react-router';
 
 interface FormElements extends HTMLFormControlsCollection {
   name: HTMLInputElement;
@@ -31,7 +32,7 @@ export const SignUp: React.FC = () => {
   const [alert, setAlert] = useState(false);
   const [alertContent, setAlertContent] = useState('');
   // const [errors, setErrors] = useState<Record<string, string[]> | null>(null);  // TODO implement error improved error handling per field
-
+  const navigate = useNavigate();
 
     useEffect(() => {
         google.accounts.id.initialize({
@@ -53,6 +54,7 @@ export const SignUp: React.FC = () => {
       if(response.ok){
           const data = await response.json();
           auth.login(data);
+          navigate('/dashboard');
       } else {
           const responseBody = await response.json();
           setAlert(true);
@@ -82,6 +84,7 @@ export const SignUp: React.FC = () => {
       if(response.ok){
           const data = await response.json();
           auth.login(data);
+          navigate('/dashboard');
       } else {
           const responseBody = await response.json();
           setAlert(true);
