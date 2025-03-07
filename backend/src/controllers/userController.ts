@@ -9,7 +9,8 @@ import { requestPasswordReset } from '../services/userService';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, name, googleId, password } = req.body.user || req.body;
+    const { email, name, password } = req.body.user || req.body;
+    const { email_verified, googleId, picture_url } = req.body.user || {};
 
     if (!email || (!password && !googleId)) {
       res.status(400).json({ message: 'Missing required fields' });
@@ -20,14 +21,20 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     if (googleId) {
       userData.googleId = googleId;
-      userData.picture = req.body.user.picture;
+      userData.picture_url = picture_url;
+      userData.email_verified = email_verified;
     } else {
       userData.password = password;
     }
 
-    const token = await userService.signup(userData);
+    const signUpResponse = await userService.signup(userData);
+    if (!signUpResponse) {
+      res.status(400).json({ message: 'Failed to sign up' });
+      return;
+    }
+    const { token, user: newUser } = signUpResponse;
     logger.info(`User signed up: ${email}`);
-    res.status(201).json({ token, name, email });
+    res.status(201).json({ token, name: newUser.name, email: newUser.email, picture_url: newUser.picture_url });
   } catch (error) {
     logger.error(`Signup error: ${(error as Error).message}`);
     if ((error as Error).message.includes('already exists')) {
@@ -51,7 +58,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
         throw new Error('User not found');
       }
       logger.info(`User signed in with Google: ${userEmail}`);
-      res.status(200).json({ token, name: userData.name, email: userData.email });
+      res.status(200).json({ token, name: userData.name, email: userData.email, picture_url: userData.picture_url });
     } else if (email && password) {
       const token = await userService.signIn({ email, password });
       const userData = await userService.getUserByEmail(email);
@@ -59,7 +66,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
         throw new Error('User not found');
       }
       logger.info(`User signed in: ${email}`);
-      res.status(200).json({ token, name: userData.name, email: userData.email });
+      res.status(200).json({ token, name: userData.name, email: userData.email, picture_url: userData.picture_url });
     } else {
       res.status(400).json({ message: 'Missing required fields' });
     }

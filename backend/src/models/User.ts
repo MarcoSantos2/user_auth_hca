@@ -53,6 +53,9 @@ export class User {
   @OneToMany(() => Feedback, (feedback) => feedback.user)
   feedbacks!: Feedback[];
 
+  @Column({ nullable: true })
+  picture_url?: string;
+
   @CreateDateColumn()
   created_at!: Date;
 

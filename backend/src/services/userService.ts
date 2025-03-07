@@ -11,8 +11,8 @@ import { GoogleAccount } from '../models/GoogleAccount';
 import { Company } from '../models/Company';
 import { sendEmail } from '../utils/email/sendEmail';
 
-export const signup = async (userData: UserData): Promise<string | null> => {
-  const { email, name, password, googleId } = userData;
+export const signup = async (userData: UserData): Promise<{ token: string; user: User } | null> => {
+  const { email, name, password, googleId, email_verified, picture_url } = userData;
 
   // Check if the user already exists
   let existingUser: User|null;
@@ -34,7 +34,8 @@ export const signup = async (userData: UserData): Promise<string | null> => {
       email,
       name,
       password: hashPassword(crypto.randomBytes(32).toString('hex')),
-      verify: true,
+      verify: email_verified,
+      picture_url,
     });
 
     const googleAccount = new GoogleAccount();
@@ -56,7 +57,10 @@ export const signup = async (userData: UserData): Promise<string | null> => {
   }
 
   if (newUser) {
-    return generateToken({ uuid: newUser.uuid, email: newUser.email });
+    return {
+      token: generateToken({ uuid: newUser.uuid, email: newUser.email }),
+      user: newUser,
+    }
   }
   return null;
 };

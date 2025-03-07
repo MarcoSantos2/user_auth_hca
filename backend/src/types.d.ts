@@ -11,7 +11,8 @@ export interface UserData {
   name: string;
   password?: string;
   googleId?: string;
-  picture?: string;
+  picture_url?: string;
+  email_verified?: boolean;
 }
 
 export type CreateRole = Pick<Role, "name" | "description" | "slug" | "company">;

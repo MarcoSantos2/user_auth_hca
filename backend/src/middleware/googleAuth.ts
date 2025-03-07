@@ -27,7 +27,8 @@ export async function googleAuth(req: Request, res: Response, next: NextFunction
       email: payload.email,
       name: payload.name || '',
       googleId: payload.sub,
-      picture: payload.picture || '',
+      picture_url: payload.picture || '',
+      email_verified: payload.email_verified || false
     };
 
     next();
