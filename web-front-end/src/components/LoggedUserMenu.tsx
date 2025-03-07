@@ -7,17 +7,35 @@ import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
+import { useNavigate } from 'react-router';
+
 import ColorModeIconDropdown from './ColorModeIconDropdown';
+import { useAuth } from '../context';
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
-interface Props {
-  isLoggedIn: boolean;
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export default function LoggedUserMenu({isLoggedIn, setIsLoggedIn}: Props) {
+export default function LoggedUserMenu() {
+  const auth = useAuth();
+  const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+
+  const settings = [
+    {id: 'logged_user_profile_menu', title: 'Profile', onClick: () => {
+      handleCloseUserMenu();
+      navigate('/profile');
+    }}, 
+    {id: 'logged_user_account_menu', title: 'Account', onClick: () => {
+      handleCloseUserMenu();
+      navigate('/account');
+    }}, 
+    {id: 'logged_user_dashboard_menu', title: 'Dashboard', onClick: () => {
+      handleCloseUserMenu();
+      navigate('/dashboard');
+    }}, 
+    {id: 'logged_user_logout_menu', title: 'Logout', onClick: () => {
+      handleCloseUserMenu();
+      auth.logout();
+      navigate('/');
+    }}
+  ];
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -25,17 +43,16 @@ export default function LoggedUserMenu({isLoggedIn, setIsLoggedIn}: Props) {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
-    setIsLoggedIn(false);
   };
 
-  if (!isLoggedIn) {
+  if (!auth.isLogin()) {
     return null
   }
   return (
     <Box sx={{ flexGrow: 0 }}>
-      <Tooltip title="Open settings">
+      <Tooltip title={auth.name}>
         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+          <Avatar alt={auth.name} src={auth.picture_url}>{auth.name.split(' ')[0][0]}</Avatar>
         </IconButton>
       </Tooltip>
       <Menu
@@ -55,8 +72,8 @@ export default function LoggedUserMenu({isLoggedIn, setIsLoggedIn}: Props) {
         onClose={handleCloseUserMenu}
       >
         {settings.map((setting) => (
-          <MenuItem key={setting} onClick={handleCloseUserMenu}>
-            <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+          <MenuItem key={setting.id} id={setting.id} onClick={setting.onClick}>
+            <Typography sx={{ textAlign: 'center' }}>{setting.title}</Typography>
           </MenuItem>
         ))}
         <Box sx={{ display: { xs: 'none', md: 'flex' }}}>
