@@ -19,12 +19,15 @@ export type CreateRole = Pick<Role, "name" | "description" | "slug" | "company">
 
 export type UpdateRole = Pick<Role, "name" | "description" | "slug">;
 
-interface DirectLoginPayload {
+interface BaseLoginPayload {
   email: string;
+  stayConnected?: boolean;
+}
+
+interface DirectLoginPayload extends BaseLoginPayload {
   password: string;
 }
 
-interface ExternalLoginPayload {
-  email: string;
+interface ExternalLoginPayload extends BaseLoginPayload {
   googleId?: string;
 }

@@ -11,7 +11,7 @@ import { GoogleAccount } from '../models/GoogleAccount';
 import { Company } from '../models/Company';
 import { sendEmail } from '../utils/email/sendEmail';
 
-export const signup = async (userData: UserData): Promise<{ token: string; user: User } | null> => {
+export const signup = async (userData: UserData, stayConnected: boolean = false): Promise<{ token: string; user: User } | null> => {
   const { email, name, password, googleId, email_verified, picture_url } = userData;
 
   // Check if the user already exists
@@ -58,7 +58,7 @@ export const signup = async (userData: UserData): Promise<{ token: string; user:
 
   if (newUser) {
     return {
-      token: generateToken({ uuid: newUser.uuid, email: newUser.email }),
+      token: generateToken({ uuid: newUser.uuid, email: newUser.email }, stayConnected ? '30d' : '12h'),
       user: newUser,
     }
   }
@@ -76,23 +76,23 @@ function isExternalLoginPayload(payload: DirectLoginPayload | ExternalLoginPaylo
 export const signIn = async (payload: DirectLoginPayload | ExternalLoginPayload): Promise<string | null> => {
   if (isExternalLoginPayload(payload)) {
     // Google Sign-In
-    const { email, googleId } = payload;
+    const { email, googleId, stayConnected } = payload as ExternalLoginPayload;
 
     const existingGoogle = await googleRepository.findGoogleAccountByEmail(email);
     const dbUser = existingGoogle ? existingGoogle.user : null;
     const isValidGoogleAccount = existingGoogle?.google_id === googleId;
 
     if (dbUser && isValidGoogleAccount) {
-      return generateToken({ uuid: dbUser.uuid, email: dbUser.email });
+      return generateToken({ uuid: dbUser.uuid, email: dbUser.email }, stayConnected ? '30d' : '12h');
     }
     throw new Error('Google user not found');
   } else {
     // Direct Sign-In
-    const { email, password } = payload;
+    const { email, password, stayConnected } = payload as DirectLoginPayload;
     const dbUser = await userRepository.findUserByEmail(email);
 
     if (dbUser && dbUser.password && comparePassword(password, dbUser.password)) {
-      return generateToken({ uuid: dbUser.uuid, email: dbUser.email });
+      return generateToken({ uuid: dbUser.uuid, email: dbUser.email }, stayConnected ? '30d' : '12h');
     }
     throw new Error('Invalid credentials');
   }

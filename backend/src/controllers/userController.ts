@@ -11,6 +11,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, name, password } = req.body.user || req.body;
     const { email_verified, googleId, picture_url } = req.body.user || {};
+    const { stay_connected: stayConnected } = req.body;
 
     if (!email || (!password && !googleId)) {
       res.status(400).json({ message: 'Missing required fields' });
@@ -27,7 +28,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       userData.password = password;
     }
 
-    const signUpResponse = await userService.signup(userData);
+    const signUpResponse = await userService.signup(userData, !!stayConnected);
     if (!signUpResponse) {
       res.status(400).json({ message: 'Failed to sign up' });
       return;
@@ -48,11 +49,11 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 // As more signin methods are added, this function needs to be updated with the new methods
 export const signin = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, user } = req.body;
+    const { email, password, user, stay_connected: stayConnected } = req.body;
 
     if (user) {
       const { email: userEmail, googleId } = user;
-      const token = await userService.signIn({ email: userEmail, googleId });
+      const token = await userService.signIn({ email: userEmail, googleId, stayConnected: !!stayConnected });
       const userData = await userService.getUserByEmail(userEmail);
       if (!userData) {
         throw new Error('User not found');
@@ -60,7 +61,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
       logger.info(`User signed in with Google: ${userEmail}`);
       res.status(200).json({ token, name: userData.name, email: userData.email, picture_url: userData.picture_url });
     } else if (email && password) {
-      const token = await userService.signIn({ email, password });
+      const token = await userService.signIn({ email, password, stayConnected: !!stayConnected });
       const userData = await userService.getUserByEmail(email);
       if (!userData) {
         throw new Error('User not found');
