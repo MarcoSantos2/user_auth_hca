@@ -8,6 +8,8 @@ import { Role } from '../models/Role';
 import { findUserByUuid } from '../repositories/userRepository';
 import { sendEmail } from '../utils/email/sendEmail';
 import jwt from 'jsonwebtoken';
+import * as companyInvitationRepository from '../repositories/companyInvitationRepository';
+import { CompanyInvitation } from '../models/CompanyInvitation';
 
 export const createCompany = async (companyData: { name: string; description?: string }, user: User): Promise<Company> => {
     // Create the company
@@ -40,7 +42,7 @@ export const createCompany = async (companyData: { name: string; description?: s
 export const getCompanyByUuid = async (uuid: string): Promise<Company | null> => {
     const company = await companyRepository.findCompanyByUuid(uuid);
     if (!company) {
-        throw new Error(`Company with UUID ${uuid} not found`);
+        throw new Error(`'Company not found'`);
     }
     return company;
 };
@@ -56,7 +58,7 @@ export const getAllCompanies = async (): Promise<Company[] | string> => {
 export const updateCompany = async (uuid: string, updates: { name?: string; description?: string }): Promise<Company> => {
   const company = await companyRepository.findCompanyByUuid(uuid);
   if (!company) {
-      throw new Error(`Company with UUID ${uuid} not found`);
+      throw new Error('Company not found');
   }
   company.name = updates.name || company.name;
   company.description = updates.description || company.description;
@@ -67,7 +69,7 @@ export const updateCompany = async (uuid: string, updates: { name?: string; desc
 export const deleteCompany = async (uuid: string): Promise<void> => {
   const company = await companyRepository.findCompanyByUuid(uuid);
   if (!company) {
-      throw new Error(`Company with UUID ${uuid} not found`);
+      throw new Error('Company not found');
   }
 
   await companyRepository.deleteCompany(uuid);
@@ -76,7 +78,7 @@ export const deleteCompany = async (uuid: string): Promise<void> => {
 export const getAllUsersInCompany = async (uuid: string): Promise<User[]> => {
   const company = await companyRepository.findCompanyByUuid(uuid, true);
   if (!company) {
-      throw new Error(`Company with UUID ${uuid} not found`);
+      throw new Error('Company not found');
   }
   return company.users;
 };
@@ -84,7 +86,7 @@ export const getAllUsersInCompany = async (uuid: string): Promise<User[]> => {
 export const getAllRolesInCompany = async (uuid: string): Promise<Role[]> => {
   const company = await companyRepository.findCompanyByUuid(uuid, false, true);
   if (!company) {
-      throw new Error(`Company with UUID ${uuid} not found`);
+      throw new Error('Company not found');
   }
   return company.roles;
 }
@@ -92,7 +94,7 @@ export const getAllRolesInCompany = async (uuid: string): Promise<Role[]> => {
 export const addUserToCompany = async (companyUuid: string, userUuid: string): Promise<Company> => {
   const company = await companyRepository.findCompanyByUuid(companyUuid, true);
   if (!company) {
-      throw new Error(`Company with UUID ${companyUuid} not found`);
+      throw new Error('Company not found');
   }
   const user = await findUserByUuid(userUuid);
   if (!user) {
@@ -111,13 +113,44 @@ export const addUserToCompany = async (companyUuid: string, userUuid: string): P
 export const isUserInCompany = async (companyUuid: string, user: User): Promise<boolean> => {
   const company = await companyRepository.findCompanyByUuid(companyUuid, true);
   if (!company) {
-      throw new Error(`Company with UUID ${companyUuid} not found`);
+      throw new Error('Company not found');
   }
   return company.users.some(u => u.id === user.id);
 }
 
+export const getCompanyInvitations = async (companyUuid: string): Promise<{invitee_email: string; invitee_name: string; accepted: boolean; created_at: Date; expires_at: Date}[]> => {
+  const company = await companyRepository.findCompanyByUuid(companyUuid);
+  if (!company) {
+    throw new Error('Company not found');
+  }
+  const invitations = await companyInvitationRepository.findInvitationsByCompany(companyUuid);
+  return invitations.map(({ invitee_email, invitee_name, accepted, created_at, expires_at }) => ({
+    invitee_email,
+    invitee_name,
+    accepted,
+    created_at,
+    expires_at
+  }));
+};
+
 export const inviteUserToCompany = async (inviteeName: string, inviteeEmail: string, company: Company, inviter: User): Promise<void> => {
-  const inviteToken = jwt.sign({ email: inviteeEmail, companyUuid: company.uuid }, process.env.JWT_SECRET || '', { expiresIn: '7d' });
+  const inviteToken = jwt.sign(
+    { email: inviteeEmail, companyUuid: company.uuid }, 
+    process.env.JWT_SECRET || '', 
+    { expiresIn: '7d' }
+  );
+
+  const decoded = jwt.decode(inviteToken) as { exp: number };
+  const expiresAt = new Date(decoded.exp * 1000); // Convert UNIX timestamp to Date
+
+  await companyInvitationRepository.createInvitation({
+    invitee_email: inviteeEmail,
+    invitee_name: inviteeName,
+    inviter_uuid: inviter.uuid,
+    company_uuid: company.uuid,
+    token: inviteToken,
+    expires_at: expiresAt
+  });
 
   const inviteUrl = `${process.env.APP_URL}/accept-invite?token=${inviteToken}`;
 
@@ -150,5 +183,10 @@ export const acceptCompanyInvite = async (inviteToken: string, user: User): Prom
     throw new Error('Company not found');
   }
   await addUserToCompany(company.uuid, user.uuid);
-
+  
+  const invitation = await companyInvitationRepository.findInvitationByToken(inviteToken);
+  if (invitation) {
+    invitation.accepted = true;
+    await companyInvitationRepository.updateInvitation(invitation);
+  }
 };
