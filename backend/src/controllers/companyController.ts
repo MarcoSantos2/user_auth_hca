@@ -127,3 +127,13 @@ export const acceptCompanyInvite = async (req: Request, res: Response): Promise<
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+export const getCompanyInvitations = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { company } = req.body;   
+    const invitations = await companyService.getCompanyInvitations(company.uuid);
+    res.status(200).json(invitations);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
