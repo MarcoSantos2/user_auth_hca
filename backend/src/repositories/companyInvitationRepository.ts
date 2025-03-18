@@ -22,3 +22,8 @@ export const findInvitationByToken = async (token: string): Promise<CompanyInvit
 export const updateInvitation = async (invitation: CompanyInvitation): Promise<CompanyInvitation> => {
     return await companyInvitationRepository.save(invitation);
 };
+
+export const deleteInvitation = async (invitation: CompanyInvitation): Promise<void> => {
+    const companyInvitationRepository = AppDataSource.getRepository(CompanyInvitation);
+    await companyInvitationRepository.remove(invitation);
+  };

@@ -166,6 +166,23 @@ export const inviteUserToCompany = async (inviteeName: string, inviteeEmail: str
   });
 };
 
+export const cancelCompanyInvitation = async (company: Company, invitationToken: string): Promise<void> => {
+  const invitation = await companyInvitationRepository.findInvitationByToken(invitationToken);
+  if (!invitation) {
+    throw new Error('Invitation not found');  
+  }
+
+  if (invitation.company_uuid !== company.uuid) {
+    throw new Error('Invalid Invitation.');
+  }
+
+  if (invitation.accepted) {
+    throw new Error('Cannot cancel an already accepted invitation');
+  }
+
+  await companyInvitationRepository.deleteInvitation(invitation);
+};
+
 export const acceptCompanyInvite = async (inviteToken: string, user: User): Promise<void> => {
   let decoded;
   try {
@@ -177,7 +194,7 @@ export const acceptCompanyInvite = async (inviteToken: string, user: User): Prom
   if (decoded.email !== user.email) {
     throw new Error('You must log in using the email address that was invited.');
   }
-
+  
   const company = await companyRepository.findCompanyByUuid(decoded.companyUuid);
   if (!company) {
     throw new Error('Company not found');
