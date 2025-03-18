@@ -15,6 +15,12 @@ export const findInvitationsByCompany = async (companyUuid: string): Promise<Com
     });
 };
 
+export const findInvitationByCompanyAndEmail = async (companyUuid: string, email: string): Promise<CompanyInvitation | null> => {
+    return await companyInvitationRepository.findOne({
+        where: { company_uuid: companyUuid, invitee_email: email }
+    });
+};
+
 export const findInvitationByToken = async (token: string): Promise<CompanyInvitation | null> => {
     return await companyInvitationRepository.findOne({ where: { token } });
 };
