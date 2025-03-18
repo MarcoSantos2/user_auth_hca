@@ -14,13 +14,14 @@ import StyledFormTitle from '../components/StyledFormTitle';
 import { useAuth } from '../context';
 import { getApiOptions } from '../utils/getApiOptions';
 import { useNavigate } from 'react-router';
+import CheckboxFormField from '../components/CheckboxFormFiled';
 
 interface FormElements extends HTMLFormControlsCollection {
   name: HTMLInputElement;
-  companyName: HTMLInputElement; // TODO: Verify if we will need the company at this point and sign up
   email: HTMLInputElement;
   password: HTMLInputElement;
   confirmPassword: HTMLInputElement;
+  stay_connected: HTMLInputElement;
 }
 
 interface SignUpFormElement extends HTMLFormElement {
@@ -76,7 +77,8 @@ export const SignUp: React.FC = () => {
       const data = {
         name: formElements.name.value,
         email: formElements.email.value,
-        password: formElements.password.value
+        password: formElements.password.value,
+        stay_connected: formElements.stay_connected.checked,
       };
       const options = getApiOptions('POST', data);
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/direct/signup`, options);
@@ -101,10 +103,10 @@ export const SignUp: React.FC = () => {
             {alert && <Alert severity="error">{alertContent}</Alert> }
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 <TextFormField label={'Full Name'} nameId={'name'} placeholder={'Enter your full name'} />
-                <TextFormField label={'Company Name'} nameId={'companyName'} placeholder={'Enter your company name'} />
                 <TextFormField label={'Email'} nameId={'email'} type="email" placeholder={'Enter your email'} />
                 <PasswordFormField label={'Password'} nameId={'password'} helperText={'Password should be at least 8 characters'} />
                 <PasswordFormField label={'Confirm Password'} nameId={'confirmPassword'} helperText={'Password should match the password above'} />
+                <CheckboxFormField label={'Stay signed in'} nameId={'stay_connected'} />
             </Box>
             <SubmitButton >{'Sign Up'}</SubmitButton>
             <StyledDivider>{'or'}</StyledDivider>

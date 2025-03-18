@@ -14,10 +14,12 @@ import StyledFormTitle from '../components/StyledFormTitle';
 import { useAuth } from '../context';
 import { getApiOptions } from '../utils/getApiOptions';
 import { useNavigate } from 'react-router';
+import CheckboxFormField from '../components/CheckboxFormFiled';
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
   password: HTMLInputElement;
+  stay_connected: HTMLInputElement;
 }
 
 interface SignInFormElement extends HTMLFormElement {
@@ -66,7 +68,8 @@ export const SignIn: React.FC = () => {
  
        const data = {
          email: formElements.email.value,
-         password: formElements.password.value
+         password: formElements.password.value,
+         stay_connected: formElements.stay_connected.checked
        };
        const options = getApiOptions('POST', data);
        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/direct/signin`, options);
@@ -92,6 +95,7 @@ export const SignIn: React.FC = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
                 <TextFormField label={'Email'} nameId={'email'} type="email" placeholder={'Enter your email'} />
                 <PasswordFormField label={'Password'} nameId={'password'} helperText={'Password should be at least 8 characters'} />
+                <CheckboxFormField label={'Stay signed in'} nameId={'stay_connected'} />
             </Box>
             <SubmitButton >{'Log In'}</SubmitButton>
             <StyledDivider>{'or'}</StyledDivider>
