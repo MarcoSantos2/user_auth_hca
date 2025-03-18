@@ -15,6 +15,8 @@ import { useAuth } from '../context';
 import { getApiOptions } from '../utils/getApiOptions';
 import { useNavigate } from 'react-router';
 import CheckboxFormField from '../components/CheckboxFormFiled';
+import { Button, Modal, Typography } from '@mui/material';
+import GoogleSignUpModal from '../components/GoogleSignUpModal';
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
@@ -29,6 +31,9 @@ interface SignInFormElement extends HTMLFormElement {
 export const SignIn: React.FC = () => {
   const auth = useAuth();
   const [alert, setAlert] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [googleCredential, setGoogleCredential] = useState<string|null>(null);
+  const [googleEmail, setGoogleEmail] = useState('');
   const [alertContent, setAlertContent] = useState('');
   // const [errors, setErrors] = useState<Record<string, string[]> | null>(null);  // TODO implement error improved error handling per field
   const navigate = useNavigate();
@@ -53,6 +58,33 @@ export const SignIn: React.FC = () => {
     if(response.ok){
         const data = await response.json();
         auth.login(data);
+        navigate('/dashboard');
+    } else {
+        const responseBody = await response.json();
+        if (responseBody.message === 'Google user not found') {
+          const decodedPayload = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
+          setGoogleEmail(decodedPayload.email);
+          setGoogleCredential(credentialResponse.credential);
+          setOpenModal(true);
+        } else {          
+          setAlert(true);
+          setAlertContent(responseBody.message);
+          // setErrors(responseBody.errors);  // TODO implement error improved error handling per field
+        }
+    }
+  }, []);
+
+  const onGoogleSignUp = useCallback(async (credential: string) => {
+    const data = {
+      token: credential
+    };
+    const options = getApiOptions('POST', data);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/signup`, options);
+
+    if(response.ok){
+        const data = await response.json();
+        auth.login(data);
+        setOpenModal(false)
         navigate('/dashboard');
     } else {
         const responseBody = await response.json();
@@ -101,6 +133,7 @@ export const SignIn: React.FC = () => {
             <StyledDivider>{'or'}</StyledDivider>
             <ProviderButton id="sign_in_google_button" label="Continue with Google" icon={<Google className="h-5 w-5 g_id_signin" />} onClick={() => google.accounts.id.prompt()} />
         </StyledForm>
+        <GoogleSignUpModal openModal={openModal} setOpenModal={setOpenModal} onGoogleSignUp={onGoogleSignUp} googleEmail={googleEmail} googleCredential={googleCredential || ''} />
       </Box>
     </Fade>
   );
