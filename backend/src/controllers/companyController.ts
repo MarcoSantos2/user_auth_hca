@@ -112,6 +112,22 @@ export const inviteUserToCompany = async (req: Request, res: Response): Promise<
   }
 };
 
+export const cancelInvitation = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { company, invitationToken } = req.body;
+
+    if (!invitationToken) {
+      res.status(400).json({ message: 'Invitation token is required' });
+      return;
+    }
+
+    await companyService.cancelCompanyInvitation(company, invitationToken);
+    res.status(200).json({ message: 'Invitation cancelled successfully' });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
 export const acceptCompanyInvite = async (req: Request, res: Response): Promise<void> => {
   try {
     const { invite_token: inviteToken, user } = req.body;
