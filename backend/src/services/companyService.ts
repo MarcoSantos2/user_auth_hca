@@ -134,6 +134,11 @@ export const getCompanyInvitations = async (companyUuid: string): Promise<{invit
 };
 
 export const inviteUserToCompany = async (inviteeName: string, inviteeEmail: string, company: Company, inviter: User): Promise<void> => {
+  const existingInvitation = await companyInvitationRepository.findInvitationByCompanyAndEmail(company.uuid, inviteeEmail);
+  if (existingInvitation) {
+    throw new Error('An invitation has already been sent to this email');
+  }
+
   const inviteToken = jwt.sign(
     { email: inviteeEmail, companyUuid: company.uuid }, 
     process.env.JWT_SECRET || '', 
@@ -206,4 +211,40 @@ export const acceptCompanyInvite = async (inviteToken: string, user: User): Prom
     invitation.accepted = true;
     await companyInvitationRepository.updateInvitation(invitation);
   }
+};
+
+export const resendCompanyInvitation = async (company: Company, inviteeEmail: string): Promise<void> => {
+  const invitation = await companyInvitationRepository.findInvitationByCompanyAndEmail(company.uuid, inviteeEmail);
+  if (!invitation) {
+    throw new Error('Invitation not found');
+  }
+
+  if (invitation.accepted) {
+    throw new Error('This invitation has already been accepted.');
+  }
+
+  const newToken = jwt.sign(
+    { email: invitation.invitee_email, companyUuid: company.uuid },
+    process.env.JWT_SECRET || '',
+    { expiresIn: '7d' }
+  );
+
+  const decoded = jwt.decode(newToken) as { exp: number };
+  const newExpiresAt = new Date(decoded.exp * 1000);
+
+  invitation.token = newToken;
+  invitation.expires_at = newExpiresAt;
+  await companyInvitationRepository.updateInvitation(invitation);
+
+  const inviteUrl = `${process.env.APP_URL}/accept-invite?token=${newToken}`;
+  await sendEmail(invitation.invitee_email, 'You are invited to join a company', 'companyInviteUser', {
+    invitee_name: invitation.invitee_name,
+    inviter_sender_organization_name: company.name,
+    action_url: inviteUrl,
+    support_email: process.env.SUPPORT_EMAIL,
+    help_url: process.env.HELP_URL,
+    product_name: process.env.PRODUCT_NAME,
+    organization_name: process.env.ORGANIZATION_NAME,
+    app_url: process.env.APP_URL
+  });
 };

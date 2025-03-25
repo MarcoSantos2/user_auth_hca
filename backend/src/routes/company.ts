@@ -20,6 +20,7 @@ router.post('/invite', verifyToken, verifyPermissions, companyController.inviteU
 router.get('/accept-invite', verifyToken, companyController.acceptCompanyInvite);
 router.get('/invitations', verifyToken, verifyPermissions, companyController.getCompanyInvitations);
 router.delete('/invitation', verifyToken, verifyPermissions, companyController.cancelInvitation);
+router.post('/invitation/resend', verifyToken, verifyPermissions, companyController.resendInvitation);
 
 // TODO - Change Middleware that verify permissions to one specific for INTERNAL USE Validation
 

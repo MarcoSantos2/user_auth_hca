@@ -3,11 +3,13 @@ import { Entity,
     Column, 
     CreateDateColumn, 
     ManyToOne, 
-    JoinColumn 
+    JoinColumn,
+    Unique
 } from 'typeorm';
 import { Company } from './Company';
 
 @Entity('company_invitations')
+@Unique(['company_uuid', 'invitee_email'])
 export class CompanyInvitation {
     @PrimaryGeneratedColumn()
     id!: number;
