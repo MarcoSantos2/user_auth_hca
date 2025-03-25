@@ -219,10 +219,6 @@ export const resendCompanyInvitation = async (company: Company, inviteeEmail: st
     throw new Error('Invitation not found');
   }
 
-  if (!invitation) {
-    throw new Error('Invitation not found');
-  }
-
   if (invitation.accepted) {
     throw new Error('This invitation has already been accepted.');
   }
