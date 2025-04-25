@@ -1,0 +1,2 @@
+*.ts linguist-language=TypeScript
+*.ejs linguist-language=ESJ
